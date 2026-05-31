@@ -1,0 +1,106 @@
+<!-- src/app/components/home/home.component.html -->
+<div class="home-wrapper">
+
+  <!-- Background texture overlay -->
+  <div class="bg-texture"></div>
+
+  <div class="home-container" [class.has-result]="result">
+
+    <!-- Logo mark (same as login) -->
+    <div class="logo-mark">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8"/>
+        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8"/>
+        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="headline">vector it.</h1>
+    <p class="subline">paste a link or drop in the full text</p>
+
+    <!-- Input card -->
+    <div class="card" *ngIf="!result">
+      <textarea
+        class="article-input"
+        [(ngModel)]="inputText"
+        placeholder="Article URL or paste article text here..."
+        rows="6"
+        [disabled]="isLoading"
+      ></textarea>
+
+      <div class="input-meta" *ngIf="inputText.trim().length > 0">
+        <span class="mode-badge" [class.url-mode]="isUrl">
+          {{ isUrl ? '🔗 url detected' : '📄 text mode' }}
+        </span>
+      </div>
+
+      <div class="error-msg" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button
+        class="analyze-btn"
+        [class.loading]="isLoading"
+        [disabled]="!inputIsValid || isLoading"
+        (click)="analyze()"
+      >
+        <span class="btn-text" *ngIf="!isLoading">ANALYZE</span>
+        <span class="btn-loader" *ngIf="isLoading">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Results card -->
+    <div class="results-card" *ngIf="result">
+
+      <!-- Bias meter -->
+      <div class="bias-section">
+        <div class="bias-labels">
+          <span class="label-left">← left</span>
+          <span class="bias-score-display" [style.color]="biasColor">
+            {{ result.bias_score > 0 ? '+' : '' }}{{ result.bias_score.toFixed(1) }}
+          </span>
+          <span class="label-right">right →</span>
+        </div>
+
+        <div class="bias-track">
+          <div class="bias-fill-left" [style.width.%]="biasPosition <= 50 ? 50 - biasPosition : 0"></div>
+          <div class="bias-center-line"></div>
+          <div class="bias-fill-right" [style.width.%]="biasPosition > 50 ? biasPosition - 50 : 0"></div>
+          <div class="bias-needle" [style.left.%]="biasPosition" [style.background]="biasColor"></div>
+        </div>
+
+        <p class="bias-desc">{{ biasDescription }}</p>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-section">
+        <h3 class="section-label">summary</h3>
+        <p class="summary-text">{{ result.summary }}</p>
+      </div>
+
+      <!-- Confidence -->
+      <div class="confidence-row" *ngIf="result.confidence">
+        <span class="conf-label">confidence</span>
+        <div class="conf-bar-track">
+          <div class="conf-bar-fill" [style.width.%]="result.confidence * 100"></div>
+        </div>
+        <span class="conf-pct">{{ (result.confidence * 100).toFixed(0) }}%</span>
+      </div>
+
+      <!-- Reset -->
+      <button class="reset-btn" (click)="reset()">
+        ← analyze another
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Logout — bottom-right, styled like "forgot password?" -->
+  <button class="logout-link" (click)="logout()">log out</button>
+
+</div>

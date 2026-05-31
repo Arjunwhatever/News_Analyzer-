@@ -1,0 +1,2 @@
+C:\Users\ArJ\Desktop\HandR\Vector\vector.client\obj\Debug\vector.client.esproj.CoreCompileInputs.cache
+A:\HandR\Vector\vector.client\obj\Debug\vector.client.esproj.CoreCompileInputs.cache

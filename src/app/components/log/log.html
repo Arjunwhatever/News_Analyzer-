@@ -1,0 +1,109 @@
+<div class="login-container">
+
+  <div class="logo-section">
+
+    <div class="logo-v">
+      <svg viewBox="0 0 100 120" class="v-svg">
+
+        <polyline
+          points="50,110 10,10"
+          stroke="white"
+          stroke-width="1"
+          fill="none"
+        />
+
+        <polyline
+          points="50,110 90,10"
+          stroke="white"
+          stroke-width="1"
+          fill="none"
+        />
+
+        <line
+          x1="20"
+          y1="10"
+          x2="80"
+          y2="10"
+          stroke="white"
+          stroke-width="0.5"
+        />
+
+        <line
+          x1="25"
+          y1="20"
+          x2="75"
+          y2="20"
+          stroke="white"
+          stroke-width="0.5"
+        />
+
+      </svg>
+    </div>
+
+    <h1 class="brand-name">vector.</h1>
+
+  </div>
+
+  <form class="login-form" (ngSubmit)="onLogin()">
+
+    <div class="form-group">
+      <input
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Username"
+        class="input-field"
+        required
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div class="form-group">
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Password"
+        class="input-field"
+        required
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div class="error-msg" *ngIf="error" style="color: #b87070; font-size: 12px; margin-bottom: 16px; text-align: center; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;">
+      {{ error }}
+    </div>
+
+    <button type="submit" class="login-btn" [disabled]="isLoading">
+      {{ isLoading ? 'LOGGING IN...' : 'LOGIN' }}
+    </button>
+
+  </form>
+
+  <div class="tagline-section">
+
+    <h2 class="tagline">
+      TRUTH UNFILTERED
+    </h2>
+
+    <div class="ticker-wrapper">
+
+      <div
+        class="ticker"
+        [class.ticker-animate]="tickerAnimated"
+      >
+
+        <span
+          *ngFor="let category of [...categories, ...categories]"
+          class="ticker-item"
+        >
+          · {{ category }} ·
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

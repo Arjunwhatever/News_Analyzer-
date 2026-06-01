@@ -1,0 +1,84 @@
+<div class="login-wrapper">
+  <div class="bg-texture"></div>
+
+  <div class="login-container">
+    <div class="logo-mark">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8"/>
+        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8"/>
+        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <h1 class="brand">vector.</h1>
+    <p class="tagline"></p>
+
+    <form class="login-form" (ngSubmit)="onLogin()">
+
+    <div class="form-group">
+      <input
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Username"
+        class="input-field"
+        required
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div class="form-group">
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Password"
+        class="input-field"
+        required
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div class="error-msg" *ngIf="error" style="color: #b87070; font-size: 12px; margin-bottom: 16px; text-align: center; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;">
+      {{ error }}
+    </div>
+
+    <button type="submit" class="login-btn" [disabled]="isLoading">
+      {{ isLoading ? 'LOGGING IN...' : 'LOGIN' }}
+    </button>
+
+    </form>
+
+    <div class="register-link">
+      <p>
+        Don't have an account?
+        <a routerLink="/register">Create one</a>
+      </p>
+    </div>
+
+    <div class="tagline-section">
+
+    <h2 class="tagline">
+      TRUTH UNFILTERED
+    </h2>
+
+    <div class="ticker-wrapper">
+
+      <div
+        class="ticker"
+        [class.ticker-animate]="tickerAnimated"
+      >
+
+        <span
+          *ngFor="let category of [...categories, ...categories]"
+          class="ticker-item"
+        >
+          · {{ category }} ·
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

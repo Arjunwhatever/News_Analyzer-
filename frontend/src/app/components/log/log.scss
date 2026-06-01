@@ -1,0 +1,257 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.bg-texture {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(72,68,58,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(58,55,48,0.15) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeUp 0.45s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.logo-mark {
+  margin-bottom: 1.2rem;
+  opacity: 0.85;
+}
+
+.brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: #c8c4b8;
+  margin: 0 0 0.4rem;
+  text-align: center;
+}
+
+.tagline {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 2rem;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 360px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px 20px;
+
+  background-color: #2a2a2a;
+  border: none;
+  border-radius: 12px;
+
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+
+  outline: none;
+  transition: background-color 0.2s;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  &:focus {
+    background-color: #333333;
+  }
+}
+
+.forgot-link {
+  display: block;
+
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+
+  text-decoration: none;
+  margin-bottom: 24px;
+
+  text-align: right;
+  transition: color 0.2s;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.register-link {
+  width: 100%;
+  max-width: 360px;
+  margin: 16px auto 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+
+  a {
+    color: #c8c4b8;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+}
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+
+  background-color: #c0c0c0;
+  border: none;
+  border-radius: 12px;
+
+  color: #1a1a1a;
+
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s, transform 0.1s;
+
+  &:hover {
+    background-color: #d4d4d4;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.tagline-section {
+  width: 100%;
+  text-align: center;
+
+  margin-top: 60px;
+}
+
+.tagline {
+  font-size: 20px;
+  font-weight: 700;
+
+  letter-spacing: 4px;
+  text-transform: uppercase;
+
+  margin-bottom: 16px;
+}
+
+.ticker-wrapper {
+  width: 100%;
+  overflow: hidden;
+
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.ticker {
+  display: flex;
+  width: max-content;
+  gap: 8px;
+}
+
+.ticker-animate {
+  animation: ticker-scroll 20s linear infinite;
+}
+
+.ticker-item {
+  flex-shrink: 0;
+
+  margin-right: 32px;
+
+  font-size: 10px;
+  letter-spacing: 1px;
+
+  color: rgba(255, 255, 255, 0.6);
+}
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+
+@media (max-height: 700px) {
+  .login-container {
+    padding: 40px 20px 30px;
+  }
+
+  .logo-v {
+    width: 100px;
+    height: 120px;
+  }
+
+  .tagline-section {
+    margin-top: 40px;
+  }
+}

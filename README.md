@@ -1,6 +1,5 @@
 **How to RUN**
-
-Run Both Backend & Frontend Together
+Option A: Run Both Backend & Frontend Together
  frontend on https://localhost:62523:
 
 `
@@ -8,7 +7,7 @@ cd backend
 dotnet run --launch-profile http
 `
 
-3. Option B: Run Backend & Frontend Separately (Recommended for Development)
+Option B: Run Backend & Frontend Separately (Recommended for Development)
 If you prefer running them in separate terminal windows for cleaner logs:
 
 In Terminal 1 (Backend):

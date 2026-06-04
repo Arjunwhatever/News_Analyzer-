@@ -1,2 +1,3 @@
-C:\Users\ArJ\Desktop\HandR\Vector\vector.client\obj\Debug\vector.client.esproj.CoreCompileInputs.cache
-A:\HandR\Vector\vector.client\obj\Debug\vector.client.esproj.CoreCompileInputs.cache
+C:/Users/ArJ/Desktop/HandR/Vector/vector.client/obj/Debug/vector.client.esproj.CoreCompileInputs.cache
+A:/HandR/Vector/vector.client/obj/Debug/vector.client.esproj.CoreCompileInputs.cache
+/home/arj/Work/News_Front/News_Analyzer-/frontend/obj/Debug/vector.client.esproj.CoreCompileInputs.cache

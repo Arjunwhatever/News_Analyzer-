@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace Vector.Server.Data
@@ -10,7 +10,7 @@ namespace Vector.Server.Data
             var optionsBuilder = new DbContextOptionsBuilder<UserDbContext>();
 
             optionsBuilder.UseSqlServer(
-                "Server=(localdb)\\MSSQLLocalDB;Database=VectorDb;Trusted_Connection=True;TrustServerCertificate=True");
+                "Server=127.0.0.1,1433;Database=VectorDb;User Id=sa;Password=Your_password123;TrustServerCertificate=true");
 
             return new UserDbContext(optionsBuilder.Options);
         }

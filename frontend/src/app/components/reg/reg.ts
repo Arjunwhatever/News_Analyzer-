@@ -19,7 +19,7 @@ export class RegisterComponent {
   isLoading: boolean = false;
   errorMessage: string = '';
 
-  private apiUrl = 'http://localhost:5277/api';
+  private apiUrl = 'https://localhost:7121/api';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -45,7 +45,7 @@ export class RegisterComponent {
     this.isLoading = true;
 
     this.http.post(`${this.apiUrl}/auth/register`, {
-      email: this.email,
+      username: this.email,
       password: this.password
     }).subscribe({
       next: () => {

@@ -86,6 +86,9 @@ namespace Vector.Server.Models
     {
         [JsonPropertyName("content")]
         public string? Content { get; set; }
+
+        [JsonPropertyName("reasoning")]
+        public string? Reasoning { get; set; }
     }
 
     /// <summary>

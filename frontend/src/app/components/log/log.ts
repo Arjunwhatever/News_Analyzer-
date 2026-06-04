@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-log',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './log.html',
   styleUrls: ['./log.scss']
 })
@@ -31,9 +32,7 @@ export class LogComponent {
     'PEOPLE UNFILTERED'
   ];
 
-  private apiUrl = 'https://localhost:7121/api/auth';
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
     if (!this.username.trim() || !this.password.trim() || this.isLoading) {
@@ -43,12 +42,8 @@ export class LogComponent {
     this.isLoading = true;
     this.error = null;
 
-    this.http.post(`${this.apiUrl}/login`, {
-      username: this.username.trim(),
-      password: this.password
-    }, { responseType: 'text' }).subscribe({
-      next: (token) => {
-        localStorage.setItem('token', token);
+    this.authService.login(this.username.trim(), this.password).subscribe({
+      next: () => {
         this.isLoading = false;
         this.router.navigate(['/home']);
       },

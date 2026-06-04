@@ -8,8 +8,8 @@ namespace Vector.Server.Services
 {
     public class BiasAnalyzerService
     {
-        // Resilient fallback selection on OpenRouter
-        private const string Model = "openrouter/free";
+        // Google Gemma 4 31B — Free model with decent output 
+        private const string Model = "google/gemma-4-31b-it:free";
         private const string ApiBase = "https://openrouter.ai/api/v1/chat/completions";
 
         private readonly HttpClient _http;
@@ -65,9 +65,9 @@ namespace Vector.Server.Services
             return ParseResponse(responseJson);
         }
 
-        // -----------------------------------------------------------------------
+       
         // Private helpers
-        // -----------------------------------------------------------------------
+       
 
         private static string SystemPrompt() => """
             You are an expert political media analyst. Your job is to evaluate the political bias
@@ -118,8 +118,14 @@ namespace Vector.Server.Services
             var openRouterResp = JsonSerializer.Deserialize<OpenRouterResponse>(responseJson, _jsonOptions)
                 ?? throw new InvalidOperationException("Empty response from API.");
 
-            var rawContent = openRouterResp.Choices?.FirstOrDefault()?.Message?.Content
-                ?? throw new InvalidOperationException("No message content in API response.");
+            var message = openRouterResp.Choices?.FirstOrDefault()?.Message;
+
+            // Primary: read from content. Fallback: read from reasoning
+            // (some free models are reasoning-only and put output in the reasoning field)
+            var rawContent = message?.Content
+                ?? message?.Reasoning
+                ?? throw new InvalidOperationException(
+                    $"No message content in API response. Raw JSON: {responseJson[..Math.Min(500, responseJson.Length)]}");
 
             // Strip potential markdown fences the model might include despite instructions
             var cleaned = StripMarkdownFences(rawContent.Trim());

@@ -3,12 +3,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './reg.html',
   styleUrls: ['./reg.scss']
 })
@@ -19,9 +20,7 @@ export class RegisterComponent {
   isLoading: boolean = false;
   errorMessage: string = '';
 
-  private apiUrl = 'https://localhost:7121/api';
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   register() {
     this.errorMessage = '';
@@ -44,10 +43,7 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
-    this.http.post(`${this.apiUrl}/auth/register`, {
-      username: this.email,
-      password: this.password
-    }).subscribe({
+    this.authService.register(this.email, this.password).subscribe({
       next: () => {
         // Registration successful — go to login
         this.router.navigate(['/login']);

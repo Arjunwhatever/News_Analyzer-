@@ -1,20 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-interface AnalysisResult {
-  summary: string;
-  bias_score: number;
-  bias_label: string;
-  confidence: number;
-}
+import { AuthService } from '../../services/auth.service';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalysisResult } from '../../models/analysis-result';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -24,14 +20,14 @@ export class HomeComponent {
   result: AnalysisResult | null = null;
   error: string | null = null;
 
-  // Real local API URL from launchSettings.json
-  private apiUrl = 'https://localhost:7121/api';
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private analysisService: AnalysisService,
+    private router: Router
+  ) {}
 
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/']);
+    this.authService.logout();
   }
 
   get isUrl(): boolean {
@@ -80,11 +76,7 @@ export class HomeComponent {
     this.result = null;
     this.error = null;
 
-    const payload = this.isUrl
-      ? { url: this.inputText.trim() }
-      : { text: this.inputText.trim() };
-
-    this.http.post<AnalysisResult>(`${this.apiUrl}/analysis/analyze`, payload).subscribe({
+    this.analysisService.analyze(this.inputText).subscribe({
       next: (data) => {
         this.result = data;
         this.isLoading = false;

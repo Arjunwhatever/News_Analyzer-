@@ -1,8 +1,9 @@
 // src/app/components/register/register.component.ts
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -19,6 +20,8 @@ export class RegisterComponent {
   confirmPassword: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -43,19 +46,21 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
-    this.authService.register(this.email, this.password).subscribe({
-      next: () => {
-        // Registration successful — go to login
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        if (err.status === 409) {
-          this.errorMessage = 'An account with this email already exists.';
-        } else {
-          this.errorMessage = 'Something went wrong. Please try again.';
+    this.authService.register(this.email, this.password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          // Registration successful — go to login
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          if (err.status === 409) {
+            this.errorMessage = 'An account with this email already exists.';
+          } else {
+            this.errorMessage = 'Something went wrong. Please try again.';
+          }
         }
-      }
-    });
+      });
   }
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
 import { AnalysisService } from '../../services/analysis.service';
@@ -19,6 +20,8 @@ export class HomeComponent {
   isLoading: boolean = false;
   result: AnalysisResult | null = null;
   error: string | null = null;
+
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private authService: AuthService,
@@ -76,16 +79,18 @@ export class HomeComponent {
     this.result = null;
     this.error = null;
 
-    this.analysisService.analyze(this.inputText).subscribe({
-      next: (data) => {
-        this.result = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.error = err?.error?.message || err?.error || 'Something went wrong. Please try again.';
-        this.isLoading = false;
-      }
-    });
+    this.analysisService.analyze(this.inputText)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.result = data;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.error = err?.error?.message || err?.error || 'Something went wrong. Please try again.';
+          this.isLoading = false;
+        }
+      });
   }
 
   reset() {

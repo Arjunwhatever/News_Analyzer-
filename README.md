@@ -26,6 +26,10 @@ cd frontend
 npm start
 `
 
+*RUN Tests*
+`cd frontend`
+`npm run test`
+
 
 
 *NOTE:* If on linux start MS SQL using Docker

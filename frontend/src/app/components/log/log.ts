@@ -35,7 +35,8 @@ export class LogComponent {
     'PEOPLE UNFILTERED'
   ];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   onLogin(): void {
     if (!this.username.trim() || !this.password.trim() || this.isLoading) {

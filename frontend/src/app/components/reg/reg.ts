@@ -23,7 +23,8 @@ export class RegisterComponent {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   register() {
     this.errorMessage = '';
@@ -56,7 +57,7 @@ export class RegisterComponent {
         error: (err) => {
           this.isLoading = false;
           if (err.status === 409) {
-            this.errorMessage = 'An account with this email already exists.';
+            this.errorMessage = 'Account already exists.';
           } else {
             this.errorMessage = 'Something went wrong. Please try again.';
           }

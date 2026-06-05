@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,12 +22,11 @@ export class HomeComponent {
   error: string | null = null;
 
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
-  constructor(
-    private authService: AuthService,
-    private analysisService: AnalysisService,
-    private router: Router
-  ) {}
+  private authService = inject(AuthService);
+  private analysisService = inject(AnalysisService);
+  private router = inject(Router);
 
   logout() {
     this.authService.logout();
@@ -85,10 +84,12 @@ export class HomeComponent {
         next: (data) => {
           this.result = data;
           this.isLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.error = err?.error?.message || err?.error || 'Something went wrong. Please try again.';
           this.isLoading = false;
+          this.cdr.detectChanges();
         }
       });
   }

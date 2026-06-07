@@ -21,10 +21,6 @@ export class RegisterComponent {
   isLoading: boolean = false;
   errorMessage: string = '';
 
-  strengthPercent: number = 0;
-  strengthColor: string = '#4a4a45';
-  strengthLabel: string = '';
-
   private destroyRef = inject(DestroyRef);
 
   private authService = inject(AuthService);
@@ -44,14 +40,8 @@ export class RegisterComponent {
       return;
     }
 
-    if (this.password.length < 8) {
-      this.errorMessage = 'Password must be at least 8 characters.';
-      return;
-    }
-
-    const score = this.getScore(this.password);
-    if (score < 3) {
-      this.errorMessage = 'Password is too weak. Mix letters, numbers, and symbols.';
+    if (this.password.length < 6) {
+      this.errorMessage = 'Password must be at least 6 characters.';
       return;
     }
 
@@ -73,42 +63,5 @@ export class RegisterComponent {
           }
         }
       });
-  }
-
-  onPasswordChange() {
-    this.calculateStrength(this.password);
-  }
-
-  private getScore(password: string): number {
-    if (!password) return 0;
-    let score = 0;
-    if (password.length >= 8) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    return score;
-  }
-
-  private calculateStrength(password: string) {
-    const score = this.getScore(password);
-    if (!password) {
-      this.strengthPercent = 0;
-      this.strengthLabel = '';
-      return;
-    }
-
-    this.strengthPercent = (score / 5) * 100;
-
-    if (score <= 2) {
-      this.strengthColor = '#b87070'; // Weak
-      this.strengthLabel = 'Weak';
-    } else if (score === 3 || score === 4) {
-      this.strengthColor = '#d4b483'; // Fair
-      this.strengthLabel = 'Fair';
-    } else if (score === 5) {
-      this.strengthColor = '#8ab870'; // Strong
-      this.strengthLabel = 'Strong';
-    }
   }
 }

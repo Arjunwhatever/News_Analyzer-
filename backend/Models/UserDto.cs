@@ -1,4 +1,4 @@
-﻿namespace Vector.Server.Models
+namespace Vector.Server.Models
 {
     public class UserDto
     {

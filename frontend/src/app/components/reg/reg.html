@@ -39,9 +39,17 @@
         class="form-input"
         placeholder="Password"
         [(ngModel)]="password"
+        (ngModelChange)="onPasswordChange()"
         [disabled]="isLoading"
         (keyup.enter)="register()"
       />
+      <!-- Password strength indicator -->
+      <div class="password-strength-container" *ngIf="password">
+        <div class="strength-bar">
+          <div class="strength-fill" [style.width.%]="strengthPercent" [style.background]="strengthColor"></div>
+        </div>
+        <p class="strength-text" [style.color]="strengthColor">{{ strengthLabel }}</p>
+      </div>
     </div>
 
     <div class="form-group">

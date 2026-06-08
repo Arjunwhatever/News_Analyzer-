@@ -26,13 +26,39 @@ namespace Vector.Server.Controller
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<string>> Login(UserDto request)
+        public async Task<IActionResult> Login(UserDto request)
         {
            var token = await authService.LoginAsync(request);
             if (token == null)
                 return BadRequest("Invalid username or password");
-            return Ok(token);
 
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Must be true in production, works locally because we use HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(1)
+            };
+            Response.Cookies.Append("jwt", token, cookieOptions);
+
+            var isAuthOptions = new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(1)
+            };
+            Response.Cookies.Append("isAuthenticated", "true", isAuthOptions);
+
+            return Ok(new { message = "Logged in successfully" });
+        }
+
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            Response.Cookies.Delete("isAuthenticated");
+            return Ok(new { message = "Logged out successfully" });
         }
         [Authorize]
         [HttpGet]

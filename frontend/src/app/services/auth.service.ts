@@ -11,11 +11,9 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  /** POST /api/auth/login — returns a raw JWT string. */
-  login(username: string, password: string): Observable<string> {
-    return this.http
-      .post(`${this.apiUrl}/login`, { username, password }, { responseType: 'text' })
-      .pipe(tap(token => localStorage.setItem('token', token)));
+  /** POST /api/auth/login — sets HTTP-Only cookies automatically. */
+  login(username: string, password: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/login`, { username, password });
   }
 
   /** POST /api/auth/register — creates a new user account. */
@@ -23,19 +21,15 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, { username, password });
   }
 
-  /** Remove the stored token and navigate to the login page. */
+  /** Remove cookies via backend and navigate to the login page. */
   logout(): void {
-    localStorage.removeItem('token');
-    this.router.navigate(['/']);
+    this.http.post(`${this.apiUrl}/logout`, {}).subscribe(() => {
+      this.router.navigate(['/']);
+    });
   }
 
-  /** Retrieve the stored JWT (or null if not logged in). */
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  /** Quick check — true when a token exists in storage. */
+  /** Quick check — true when the isAuthenticated cookie exists. */
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return document.cookie.includes('isAuthenticated=true');
   }
 }

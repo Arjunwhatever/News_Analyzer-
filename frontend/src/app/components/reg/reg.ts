@@ -1,5 +1,5 @@
 // src/app/components/register/register.component.ts
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -22,6 +22,7 @@ export class RegisterComponent {
   errorMessage: string = '';
 
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -52,15 +53,20 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           // Registration successful — go to login
+          this.isLoading = false;
+          this.cdr.detectChanges();
           this.router.navigate(['/login']);
         },
         error: (err) => {
           this.isLoading = false;
-          if (err.status === 409) {
+          if (err.status === 400) {
+            this.errorMessage = err.error || 'Invalid format.';
+          } else if (err.status === 409) {
             this.errorMessage = 'Account already exists.';
           } else {
             this.errorMessage = 'Something went wrong. Please try again.';
           }
+          this.cdr.detectChanges();
         }
       });
   }

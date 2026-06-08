@@ -52,6 +52,7 @@ npm run test
 
 
 ## Database Setup
+<img width="889" height="286" alt="image" src="https://github.com/user-attachments/assets/b3e6ac9e-e049-45c6-bc82-860c4a1d449b" />
 
 1. Ensure that the SQL Server database is running.
 

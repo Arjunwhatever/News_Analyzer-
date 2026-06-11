@@ -42,8 +42,11 @@ https://localhost:62523
 ```
 
 ## Run Tests
-
-Navigate to the frontend directory and run the test suite:
+Running backend tests (without connecting to an actual DB)
+```bash
+dotnet test tests/Vector.Server.Tests/Vector.Server.Tests.csproj
+```
+Navigate to the frontend directory and run the frontend unit test suite:
 
 ```bash
 cd frontend

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RegisterComponent } from './reg';
+import { RegisterComponent } from './register.component';
 import { AuthService } from '../../services/auth.service';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -80,7 +80,7 @@ describe('RegisterComponent', () => {
     component.register();
 
     expect(component.isLoading).toBe(false);
-    expect(component.errorMessage).toBe('An account with this email already exists.');
+    expect(component.errorMessage).toBe('Account already exists.');
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 });

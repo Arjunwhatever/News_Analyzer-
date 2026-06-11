@@ -12,8 +12,8 @@ import { AnalysisResult } from '../../models/analysis-result';
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './home.html',
-  styleUrls: ['./home.scss']
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
   inputText: string = '';

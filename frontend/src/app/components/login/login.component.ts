@@ -10,10 +10,10 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-log',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './log.html',
-  styleUrls: ['./log.scss']
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
-export class LogComponent {
+export class LoginComponent {
 
   username = '';
   password = '';

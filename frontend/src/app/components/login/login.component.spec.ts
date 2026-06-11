@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LogComponent } from './log';
+import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
 import { Router, provideRouter, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-describe('LogComponent', () => {
-  let component: LogComponent;
-  let fixture: ComponentFixture<LogComponent>;
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
   let authServiceSpy: any;
   let routerSpy: any;
 
@@ -17,7 +17,7 @@ describe('LogComponent', () => {
     routerSpy = { navigate: vi.fn() };
 
     await TestBed.configureTestingModule({
-      imports: [LogComponent], // Standalone component
+      imports: [LoginComponent], // Standalone component
       providers: [
         provideRouter([]),
         { provide: ActivatedRoute, useValue: {} },
@@ -26,7 +26,7 @@ describe('LogComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LogComponent);
+    fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

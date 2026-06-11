@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/Vector.Server.csproj" />
+  </Folder>
+  <Folder Name="/frontend/">
+    <Project Path="frontend/vector.client.esproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Vector.Server.Tests/Vector.Server.Tests.csproj" />
+  </Folder>
+</Solution>

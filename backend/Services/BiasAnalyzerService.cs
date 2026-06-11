@@ -32,6 +32,7 @@ namespace Vector.Server.Services
             _http.Timeout = TimeSpan.FromSeconds(90);
         }
 
+        // The core method that takes raw text, packages it up nicely, and sends it to the AI model
         public async Task<AnalysisResult> AnalyzeAsync(string articleText)
         {
             var prompt = BuildPrompt(articleText);
@@ -61,6 +62,7 @@ namespace Vector.Server.Services
                     $"Details: {errorBody}");
             }
 
+            // Grab the JSON string the AI spat back and parse it into our clean C# object
             var responseJson = await response.Content.ReadAsStringAsync();
             return ParseResponse(responseJson);
         }
@@ -113,6 +115,7 @@ namespace Vector.Server.Services
             return $"Analyze the political bias of the following news article:\n\n{truncated}";
         }
 
+        // Deserializes the raw LLM response string into our structured AnalysisResult object
         private AnalysisResult ParseResponse(string responseJson)
         {
             var openRouterResp = JsonSerializer.Deserialize<OpenRouterResponse>(responseJson, _jsonOptions)

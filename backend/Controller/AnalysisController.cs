@@ -11,6 +11,7 @@ namespace Vector.Server.Controller
         BiasAnalyzerService biasAnalyzerService,
         ArticleScraperService articleScraperService) : ControllerBase
     {
+        // The main brain of the API! This endpoint accepts an article URL or text payload, extracts the content, and passes it to the AI for bias scoring.
         [HttpPost("analyze")]
         public async Task<ActionResult<AnalysisResult>> Analyze(AnalysisRequest request)
         {
@@ -43,6 +44,7 @@ namespace Vector.Server.Controller
                     return BadRequest("Provided text is too short to perform a reliable bias analysis.");
                 }
 
+                // Once we have a decent chunk of text, we hand it off to the Bias Analyzer Service to do the heavy lifting!
                 var result = await biasAnalyzerService.AnalyzeAsync(articleText);
                 return Ok(result);
             }

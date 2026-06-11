@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +12,7 @@ namespace Vector.Server.Services
 {
     public class AuthService(UserDbContext context, IConfiguration configuration) : IAuthService
     {
+       // Handles the actual registration logic, checking for duplicates and hashing the password
        public async Task<User?> RegisterAsync(UserDto request)
         {   
             if(await context.Users.AnyAsync(u => u.Username == request.Username))
@@ -20,6 +21,7 @@ namespace Vector.Server.Services
             }
             var user = new User();
             
+            // We never store plain text passwords! Hash it up securely.
             var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
 
             user.Username = request.Username;
@@ -29,6 +31,7 @@ namespace Vector.Server.Services
             await context.SaveChangesAsync();
             return user;
         }
+        // Helper method that cooks up a JWT token holding the user's identity
         private string CreateToken(User user)
         {
             var claims = new List<Claim>
@@ -50,6 +53,7 @@ namespace Vector.Server.Services
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
+        // Checks the database for the user, verifies their password hash, and returns a token if everything checks out!
         public async Task<string?> LoginAsync(UserDto request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);

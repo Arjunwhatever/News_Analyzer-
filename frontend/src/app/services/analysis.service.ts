@@ -11,10 +11,8 @@ export class AnalysisService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * POST /api/analysis/analyze
-   * Accepts either a URL to scrape or raw article text.
-   */
+  // This takes whatever the user typed in (a URL or a block of text)
+  // and smartly packages it up to send to our backend analysis engine.
   analyze(input: string): Observable<AnalysisResult> {
     const payload = this.isUrl(input)
       ? { url: input.trim() }
@@ -23,7 +21,7 @@ export class AnalysisService {
     return this.http.post<AnalysisResult>(`${this.apiUrl}/analyze`, payload);
   }
 
-  /** Simple URL detection — matches the logic previously in HomeComponent. */
+  // A quick helper to figure out if the user pasted a link or an entire article.
   private isUrl(value: string): boolean {
     try {
       new URL(value.trim());

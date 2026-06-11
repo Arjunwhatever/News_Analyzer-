@@ -16,6 +16,7 @@ namespace Vector.Server.Controller
     public class AuthController(IAuthService authService) : ControllerBase
     {
         
+        // Creates a brand new account for the user in our database
         [HttpPost("Register")]
         public async Task<ActionResult<User>> Register(UserDto request)
         {
@@ -25,6 +26,7 @@ namespace Vector.Server.Controller
             return Ok(user);
         }
 
+        // Logs the user in by generating a secure JWT token and dropping it into an HttpOnly cookie
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserDto request)
         {
@@ -32,6 +34,7 @@ namespace Vector.Server.Controller
             if (token == null)
                 return BadRequest("Invalid username or password");
 
+            // We drop the token securely into the browser. JavaScript can't touch this!
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -53,6 +56,7 @@ namespace Vector.Server.Controller
             return Ok(new { message = "Logged in successfully" });
         }
 
+        // Clears the user's cookies, effectively logging them out immediately
         [HttpPost("Logout")]
         public IActionResult Logout()
         {

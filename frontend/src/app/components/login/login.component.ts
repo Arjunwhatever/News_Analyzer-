@@ -39,6 +39,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  // Called when the user clicks 'Log In'. Triggers the authentication flow and sends the user home if successful!
   onLogin(): void {
     if (!this.username.trim() || !this.password.trim() || this.isLoading) {
       return;
@@ -51,11 +52,13 @@ export class LoginComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          // Success! The backend gave us our cookies. Time to head to the dashboard.
           this.isLoading = false;
           this.cdr.detectChanges();
           this.router.navigate(['/home']);
         },
         error: (err) => {
+          // Uh oh, something went wrong. Let the user know what happened.
           this.error = err.error || 'Invalid username or password.';
           this.isLoading = false;
           this.cdr.detectChanges();

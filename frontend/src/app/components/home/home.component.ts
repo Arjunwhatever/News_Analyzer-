@@ -41,6 +41,7 @@ export class HomeComponent {
     }
   }
 
+  // Makes sure the user didn't just type gibberish before we send it off
   get inputIsValid(): boolean {
     return this.inputText.trim().length > 10;
   }
@@ -53,6 +54,7 @@ export class HomeComponent {
     return '#8a8a6a';                       // neutral
   }
 
+  // Calculates where the little tick mark should sit on the slider bar based on the score!
   get biasPosition(): number {
     if (!this.result) return 50;
     // Map -10..10 to 0..100%
@@ -71,6 +73,7 @@ export class HomeComponent {
     return 'strongly right';
   }
 
+  // The big green button! Fires off the text to the backend and waits for the AI's verdict.
   analyze() {
     if (!this.inputIsValid || this.isLoading) return;
 
@@ -82,6 +85,7 @@ export class HomeComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
+          // Boom, we got the results! Update the UI to show the fancy charts.
           this.result = data;
           this.isLoading = false;
           this.cdr.detectChanges();

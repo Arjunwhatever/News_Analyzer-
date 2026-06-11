@@ -30,6 +30,7 @@ export class RegisterComponent {
   register() {
     this.errorMessage = '';
 
+    // Quick sanity checks before we bother the backend
     // Basic validation
     if (!this.email || !this.password || !this.confirmPassword) {
       this.errorMessage = 'All fields are required.';
@@ -48,11 +49,12 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
+    // Everything looks good locally, let's ask the API to create the account!
     this.authService.register(this.email, this.password)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          // Registration successful — go to login
+          // Awesome, the account was created successfully! Send them back to log in.
           this.isLoading = false;
           this.cdr.detectChanges();
           this.router.navigate(['/login']);

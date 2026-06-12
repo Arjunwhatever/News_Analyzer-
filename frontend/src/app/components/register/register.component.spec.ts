@@ -57,23 +57,34 @@ describe('RegisterComponent', () => {
     expect(authServiceSpy.register).not.toHaveBeenCalled();
   });
 
+  it('should reject weak passwords', () => {
+    component.email = 'test@example.com';
+    component.password = 'weak';
+    component.confirmPassword = 'weak';
+    
+    component.register();
+
+    expect(component.errorMessage).toBe('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character.');
+    expect(authServiceSpy.register).not.toHaveBeenCalled();
+  });
+
   it('should call register on authService and navigate on success', () => {
     component.email = 'test@example.com';
-    component.password = 'pass123';
-    component.confirmPassword = 'pass123';
+    component.password = 'StrongPass123!';
+    component.confirmPassword = 'StrongPass123!';
     
     authServiceSpy.register.mockReturnValue(of({}));
 
     component.register();
 
-    expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'pass123');
+    expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'StrongPass123!');
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
 
   it('should display error when registration fails', () => {
     component.email = 'test@example.com';
-    component.password = 'pass123';
-    component.confirmPassword = 'pass123';
+    component.password = 'StrongPass123!';
+    component.confirmPassword = 'StrongPass123!';
     
     authServiceSpy.register.mockReturnValue(throwError(() => ({ status: 409 })));
 

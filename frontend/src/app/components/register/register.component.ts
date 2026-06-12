@@ -42,8 +42,9 @@ export class RegisterComponent {
       return;
     }
 
-    if (this.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters.';
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=]).{8,}$/;
+    if (!passwordRegex.test(this.password)) {
+      this.errorMessage = 'Password must be at least 8 characters and contain uppercase, lowercase, number, and special character.';
       return;
     }
 

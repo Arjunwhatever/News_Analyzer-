@@ -4,7 +4,7 @@ using Vector.Server.Models;
 
 namespace Vector.Server.Services
 {
-    public class LiveNewsService
+    public class LiveNewsService : ILiveNewsService
     {
         private readonly HttpClient _http;
         private readonly string _apiKey;

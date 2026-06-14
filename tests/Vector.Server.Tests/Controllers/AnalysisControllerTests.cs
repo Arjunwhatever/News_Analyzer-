@@ -13,6 +13,7 @@ namespace Vector.Server.Tests.Controllers
         private readonly Mock<HttpMessageHandler> _handlerMock;
         private readonly HttpClient _httpClient;
         private readonly Mock<IConfiguration> _configMock;
+        private readonly Mock<IAuthService> _authServiceMock;
 
         public AnalysisControllerTests()
         {
@@ -23,13 +24,15 @@ namespace Vector.Server.Tests.Controllers
             var configSectionMock = new Mock<IConfigurationSection>();
             configSectionMock.Setup(s => s.Value).Returns("fake-api-key");
             _configMock.Setup(c => c.GetSection("AppSettings:OpenRouterApiKey")).Returns(configSectionMock.Object);
+
+            _authServiceMock = new Mock<IAuthService>();
         }
 
         private AnalysisController CreateController()
         {
             var biasService = new BiasAnalyzerService(_httpClient, _configMock.Object);
             var scraperService = new ArticleScraperService(_httpClient);
-            return new AnalysisController(biasService, scraperService);
+            return new AnalysisController(biasService, scraperService, _authServiceMock.Object);
         }
 
         [Fact]

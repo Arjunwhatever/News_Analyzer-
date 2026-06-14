@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HomeComponent } from './home.component';
 import { AuthService } from '../../services/auth.service';
 import { AnalysisService } from '../../services/analysis.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AnalysisResult } from '../../models/analysis-result';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -22,7 +22,8 @@ describe('HomeComponent', () => {
     key_indicators: ['Indicator 1'],
     summary: 'Mock summary',
     model_used: 'mock-model',
-    topics: ['Topic 1']
+    topics: ['Topic 1'],
+    relevance_score: 90
   };
 
   beforeEach(async () => {
@@ -35,7 +36,8 @@ describe('HomeComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: AnalysisService, useValue: analysisServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: {} }
       ]
     }).compileComponents();
 

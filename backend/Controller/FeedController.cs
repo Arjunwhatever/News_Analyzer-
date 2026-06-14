@@ -11,10 +11,10 @@ namespace Vector.Server.Controller
     [Route("api/[controller]")]
     public class FeedController : ControllerBase
     {
-        private readonly LiveNewsService _newsService;
+        private readonly ILiveNewsService _newsService;
         private readonly IAuthService _authService;
 
-        public FeedController(LiveNewsService newsService, IAuthService authService)
+        public FeedController(ILiveNewsService newsService, IAuthService authService)
         {
             _newsService = newsService;
             _authService = authService;

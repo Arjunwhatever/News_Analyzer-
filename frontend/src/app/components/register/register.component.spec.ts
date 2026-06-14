@@ -72,12 +72,13 @@ describe('RegisterComponent', () => {
     component.email = 'test@example.com';
     component.password = 'StrongPass123!';
     component.confirmPassword = 'StrongPass123!';
+    component.preferredTopics = 'AI, Space';
     
     authServiceSpy.register.mockReturnValue(of({}));
 
     component.register();
 
-    expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'StrongPass123!');
+    expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'StrongPass123!', 'AI, Space');
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
 

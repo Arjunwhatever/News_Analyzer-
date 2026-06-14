@@ -9,9 +9,9 @@
     <!-- Logo mark (same as login) -->
     <div class="logo-mark">
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8"/>
-        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8"/>
-        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5"/>
+        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8" />
+        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8" />
+        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5" />
       </svg>
     </div>
 
@@ -19,15 +19,18 @@
     <h1 class="headline">vector it.</h1>
     <p class="subline">paste a link or drop in the full text</p>
 
+    <!-- Navigation -->
+    <div class="nav-actions" style="margin-bottom: 1rem;">
+      <a routerLink="/feed" class="nav-link"
+        style="font-size: 0.75rem; color: #8a8880; text-decoration: none; border: 1px solid #4a4a45; padding: 0.4rem 0.8rem; border-radius: 4px; transition: all 0.2s;">
+        view live news feed
+      </a>
+    </div>
+
     <!-- Input card -->
     <div class="card" *ngIf="!result">
-      <textarea
-        class="article-input"
-        [(ngModel)]="inputText"
-        placeholder="Article URL or paste article text here..."
-        rows="6"
-        [disabled]="isLoading"
-      ></textarea>
+      <textarea class="article-input" [(ngModel)]="inputText" placeholder="Article URL or paste article text here..."
+        rows="6" [disabled]="isLoading"></textarea>
 
       <div class="input-meta" *ngIf="inputText.trim().length > 0">
         <span class="mode-badge" [class.url-mode]="isUrl">
@@ -39,12 +42,8 @@
         {{ error }}
       </div>
 
-      <button
-        class="analyze-btn"
-        [class.loading]="isLoading"
-        [disabled]="!inputIsValid || isLoading"
-        (click)="analyze()"
-      >
+      <button class="analyze-btn" [class.loading]="isLoading" [disabled]="!inputIsValid || isLoading"
+        (click)="analyze()">
         <span class="btn-text" *ngIf="!isLoading">ANALYZE</span>
         <span class="btn-loader" *ngIf="isLoading">
           <span class="dot"></span>
@@ -83,6 +82,14 @@
         <p class="summary-text">{{ result.summary }}</p>
       </div>
 
+      <!-- Topics -->
+      <div class="topics-section" *ngIf="result.topics && result.topics.length > 0">
+        <h3 class="section-label">topics covered</h3>
+        <div class="topics-list">
+          <span class="topic-chip" *ngFor="let topic of result.topics">{{ topic }}</span>
+        </div>
+      </div>
+
       <!-- Confidence -->
       <div class="confidence-row" *ngIf="result.confidence">
         <span class="conf-label">confidence</span>
@@ -90,6 +97,15 @@
           <div class="conf-bar-fill" [style.width.%]="result.confidence * 100"></div>
         </div>
         <span class="conf-pct">{{ (result.confidence * 100).toFixed(0) }}%</span>
+      </div>
+
+      <!-- Relevance -->
+      <div class="confidence-row relevance-row" *ngIf="result.relevance_score !== undefined && result.relevance_score !== null">
+        <span class="conf-label">relevance</span>
+        <div class="conf-bar-track">
+          <div class="conf-bar-fill relevance-fill" [style.width.%]="result.relevance_score"></div>
+        </div>
+        <span class="conf-pct">{{ result.relevance_score.toFixed(0) }}%</span>
       </div>
 
       <!-- Reset -->

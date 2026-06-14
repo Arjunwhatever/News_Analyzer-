@@ -18,8 +18,8 @@ export class AuthService {
   }
 
   // Registers a brand new account and saves it to the database.
-  register(username: string, password: string): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/register`, { username, password });
+  register(username: string, password: string, preferredTopics?: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/register`, { username, password, preferredTopics });
   }
 
   // Tells the backend to destroy our session cookies, then kicks the user back to the login screen.
@@ -33,5 +33,13 @@ export class AuthService {
   // It specifically looks for the non-HttpOnly 'isAuthenticated' cookie we set during login.
   isLoggedIn(): boolean {
     return document.cookie.includes('isAuthenticated=true');
+  }
+
+  getPreferences(): Observable<{topics: string}> {
+    return this.http.get<{topics: string}>(`${this.apiUrl}/preferences`);
+  }
+
+  updatePreferences(topics: string): Observable<unknown> {
+    return this.http.put(`${this.apiUrl}/preferences`, { topics });
   }
 }

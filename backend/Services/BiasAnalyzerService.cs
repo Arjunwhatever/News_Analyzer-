@@ -33,7 +33,7 @@ namespace Vector.Server.Services
         }
 
         // The core method that takes raw text, packages it up nicely, and sends it to the AI model
-        public async Task<AnalysisResult> AnalyzeAsync(string articleText)
+        public async Task<AnalysisResult> AnalyzeAsync(string articleText, string? userTopics = null)
         {
             var prompt = BuildPrompt(articleText);
 
@@ -42,7 +42,7 @@ namespace Vector.Server.Services
                 model = Model,
                 messages = new[]
                 {
-                    new { role = "system", content = SystemPrompt() },
+                    new { role = "system", content = SystemPrompt(userTopics) },
                     new { role = "user",   content = prompt }
                 },
                 temperature = 0.2,   // Low temperature for consistent scoring
@@ -71,7 +71,13 @@ namespace Vector.Server.Services
         // Private helpers
        
 
-        private static string SystemPrompt() => """
+        private static string SystemPrompt(string? userTopics)
+        {
+            var relevanceInstruction = string.IsNullOrWhiteSpace(userTopics)
+                ? ""
+                : $"\n            The user is interested in these topics: {userTopics}. Evaluate how relevant this article is to their interests and assign a relevanceScore from 0 to 100.";
+
+            return $$"""
             You are an expert political media analyst. Your job is to evaluate the political bias
             of news articles and produce structured analysis in JSON format only.
 
@@ -100,9 +106,11 @@ namespace Vector.Server.Services
               "tone": "<Analytical | Emotional | Sensational | Neutral | Partisan>",
               "keyIndicators": ["<indicator 1>", "<indicator 2>", ...],
               "summary": "<2-3 sentence plain-English explanation of the bias>",
-              "topics": ["<topic 1>", "<topic 2>", ...]
-            }
+              "topics": ["<topic 1>", "<topic 2>", ...],
+              "relevanceScore": <number 0 to 100>
+            }{{relevanceInstruction}}
             """;
+        }
 
         private static string BuildPrompt(string articleText)
         {
@@ -157,6 +165,7 @@ namespace Vector.Server.Services
                 KeyIndicators = payload.KeyIndicators,
                 Summary       = payload.Summary,
                 Topics        = payload.Topics,
+                RelevanceScore = payload.RelevanceScore,
                 ModelUsed     = Model
             };
         }

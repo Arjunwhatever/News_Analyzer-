@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Vector.Server.Models;
 using Vector.Server.Services;
 
@@ -9,7 +10,8 @@ namespace Vector.Server.Controller
     [ApiController]
     public class AnalysisController(
         BiasAnalyzerService biasAnalyzerService,
-        ArticleScraperService articleScraperService) : ControllerBase
+        ArticleScraperService articleScraperService,
+        IAuthService authService) : ControllerBase
     {
         // The main brain of the API! This endpoint accepts an article URL or text payload, extracts the content, and passes it to the AI for bias scoring.
         [HttpPost("analyze")]
@@ -44,8 +46,15 @@ namespace Vector.Server.Controller
                     return BadRequest("Provided text is too short to perform a reliable bias analysis.");
                 }
 
+                string? userTopics = null;
+                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var userId))
+                {
+                    userTopics = await authService.GetPreferencesAsync(userId);
+                }
+
                 // Once we have a decent chunk of text, we hand it off to the Bias Analyzer Service to do the heavy lifting!
-                var result = await biasAnalyzerService.AnalyzeAsync(articleText);
+                var result = await biasAnalyzerService.AnalyzeAsync(articleText, userTopics);
                 return Ok(result);
             }
             catch (InvalidOperationException ex)

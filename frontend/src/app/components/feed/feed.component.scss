@@ -1,0 +1,461 @@
+// Tokens
+$bg:          #2d2d2a;
+$bg-dark:     #252522;
+$surface:     #363632;
+$surface-2:   #3e3e3a;
+$border:      #4a4a45;
+$text-primary:#d4d0c8;
+$text-muted:  #8a8880;
+$text-dim:    #5e5e5a;
+$accent:      #c8c4b8;
+$btn-bg:      #4a4a45;
+$btn-hover:   #5a5a54;
+
+.feed-wrapper {
+  min-height: 100vh;
+  background-color: $bg;
+  padding: 2rem 1rem;
+  position: relative;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: $text-primary;
+}
+
+.bg-texture {
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(72,68,58,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(58,55,48,0.15) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.feed-header {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headline {
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  color: $accent;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  font-size: 0.75rem;
+  color: $text-dim;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+  cursor: pointer;
+  &:hover { color: $accent; }
+}
+
+.feed-container {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  color: $text-dim;
+  padding: 3rem 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+.news-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.news-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s;
+  
+  &:hover {
+    border-color: rgba($accent, 0.3);
+  }
+}
+
+.card-image {
+  width: 100%;
+  height: 200px;
+  background: $bg-dark;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: opacity 0.3s;
+  }
+}
+
+.news-card:hover .card-image img {
+  opacity: 1;
+}
+
+.card-content {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.source-badge {
+  background: $surface-2;
+  border: 1px solid $border;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  color: $text-muted;
+  letter-spacing: 0.1em;
+}
+
+.publish-date {
+  font-size: 0.65rem;
+  color: $text-dim;
+}
+
+.article-title {
+  font-size: 1.1rem;
+  margin: 0;
+  line-height: 1.4;
+  a {
+    color: $text-primary;
+    text-decoration: none;
+    &:hover { color: $accent; }
+  }
+}
+
+.article-desc {
+  font-size: 0.8rem;
+  color: $text-muted;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+/* Analysis Area */
+.analysis-area {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed $border;
+}
+
+.analyze-btn {
+  background: transparent;
+  border: 1px solid $border;
+  color: $text-primary;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  &:hover {
+    background: $surface-2;
+    border-color: $accent;
+    color: $accent;
+  }
+}
+
+.analyzing-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: $accent;
+  font-size: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.result-widget {
+  background: $bg-dark;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba($accent, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bias-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: $text-muted;
+  text-transform: lowercase;
+}
+
+.bias-score {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.bias-track {
+  position: relative;
+  height: 4px;
+  background: $surface;
+  border-radius: 2px;
+}
+
+.bias-center-line {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: $border;
+}
+
+.bias-needle {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid $bg-dark;
+}
+
+.topics-list.small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+  .topic-chip {
+    background: $surface;
+    border: 1px solid $border;
+    color: $text-muted;
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+  }
+}
+
+/* Relevance widget in feed */
+.relevance-row-small {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed $border;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rel-label {
+  font-size: 0.65rem;
+  color: $text-muted;
+  letter-spacing: 0.1em;
+}
+
+.rel-pct {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #4ad994;
+}
+
+.rel-track {
+  height: 4px;
+  background: $surface;
+  border-radius: 2px;
+}
+
+.rel-fill {
+  height: 100%;
+  background: #4ad994;
+  border-radius: 2px;
+  transition: width 1s ease-out;
+}
+
+.error-msg {
+  color: #b84a4a;
+  font-size: 0.75rem;
+  background: rgba(184, 74, 74, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  &.tiny {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.retry-btn {
+  background: transparent;
+  border: 1px solid #b84a4a;
+  color: #b84a4a;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover {
+    background: #b84a4a;
+    color: white;
+  }
+}
+
+.logout-link {
+  position: fixed;
+  bottom: 1.4rem;
+  right: 1.6rem;
+  background: none;
+  border: none;
+  color: $text-dim;
+  font-family: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.2s;
+  &:hover { color: $text-muted; }
+}
+
+/* Dots Loader */
+.dot-loader { display: flex; gap: 4px; }
+.dot-loader .dot { width: 6px; height: 6px; background: $accent; border-radius: 50%; animation: blink 1.4s infinite; }
+.dot-loader.tiny .dot { width: 4px; height: 4px; }
+.dot-loader .dot:nth-child(2) { animation-delay: 0.2s; }
+.dot-loader .dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: $bg-dark;
+  border: 1px solid $border;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  h2 {
+    margin-top: 0;
+    color: $accent;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+  }
+  p {
+    color: $text-muted;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+}
+
+.pref-input {
+  width: 100%;
+  background: $surface;
+  border: 1px solid $border;
+  color: $text-primary;
+  padding: 0.8rem;
+  border-radius: 4px;
+  font-family: inherit;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-btn, .save-btn {
+  background: transparent;
+  border: 1px solid $border;
+  color: $text-primary;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background: $surface;
+}
+
+.save-btn {
+  background: $accent;
+  color: $bg-dark;
+  border-color: $accent;
+  font-weight: bold;
+  &:hover:not([disabled]) {
+    opacity: 0.9;
+  }
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

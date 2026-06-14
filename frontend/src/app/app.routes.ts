@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent)
   },
   {
+    path: 'feed',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/feed/feed.component').then(m => m.FeedComponent)
+  },
+  {
     path: '**',
     redirectTo: 'login'
   }

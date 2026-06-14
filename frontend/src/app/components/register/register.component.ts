@@ -18,6 +18,7 @@ export class RegisterComponent {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  preferredTopics: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
 
@@ -50,8 +51,10 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
+    this.isLoading = true;
+
     // Everything looks good locally, let's ask the API to create the account!
-    this.authService.register(this.email, this.password)
+    this.authService.register(this.email, this.password, this.preferredTopics)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

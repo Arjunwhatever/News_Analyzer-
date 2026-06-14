@@ -53,6 +53,12 @@ namespace Vector.Server.Models
         public List<string> Topics { get; set; } = new();
 
         /// <summary>
+        /// Relevance score to user preferences (0.0 - 100.0).
+        /// </summary>
+        [JsonPropertyName("relevance_score")]
+        public double? RelevanceScore { get; set; }
+
+        /// <summary>
         /// Returns the canonical label for a given bias score.
         /// </summary>
         public static string GetLabelForScore(double score) => score switch
@@ -113,5 +119,8 @@ namespace Vector.Server.Models
 
         [JsonPropertyName("topics")]
         public List<string> Topics { get; set; } = new();
+
+        [JsonPropertyName("relevanceScore")]
+        public double? RelevanceScore { get; set; }
     }
 }

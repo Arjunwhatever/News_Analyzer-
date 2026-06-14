@@ -345,6 +345,30 @@ $right-color: #b84a4a;
   letter-spacing: 0.02em;
 }
 
+// Topics section
+.topics-section {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 6px;
+  padding: 1.2rem 1.3rem;
+}
+
+.topics-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topic-chip {
+  background: $surface-2;
+  border: 1px solid rgba($accent, 0.2);
+  color: $accent;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
 // Confidence bar
 .confidence-row {
   display: flex;
@@ -374,8 +398,11 @@ $right-color: #b84a4a;
   height: 100%;
   background: $accent;
   border-radius: 2px;
-  opacity: 0.6;
-  transition: width 0.6s ease;
+  transition: width 1s ease-out;
+}
+
+.relevance-fill {
+  background: #4ad994; // A nice green for relevance
 }
 
 .conf-pct {

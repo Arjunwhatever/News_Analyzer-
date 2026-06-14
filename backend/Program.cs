@@ -32,6 +32,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<BiasAnalyzerService>();
 builder.Services.AddHttpClient<ArticleScraperService>();
+builder.Services.AddHttpClient<LiveNewsService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

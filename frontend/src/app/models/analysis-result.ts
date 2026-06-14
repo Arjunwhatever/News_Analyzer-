@@ -12,4 +12,5 @@ export interface AnalysisResult {
   summary: string;
   model_used: string;
   topics: string[];
+  relevance_score?: number;
 }

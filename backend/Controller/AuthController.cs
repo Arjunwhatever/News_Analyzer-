@@ -64,6 +64,30 @@ namespace Vector.Server.Controller
             Response.Cookies.Delete("isAuthenticated");
             return Ok(new { message = "Logged out successfully" });
         }
+
+        [Authorize]
+        [HttpGet("preferences")]
+        public async Task<IActionResult> GetPreferences()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+                return Unauthorized();
+
+            var topics = await authService.GetPreferencesAsync(userId);
+            return Ok(new { topics = topics ?? "" });
+        }
+
+        [Authorize]
+        [HttpPut("preferences")]
+        public async Task<IActionResult> UpdatePreferences([FromBody] PreferencesDto request)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+                return Unauthorized();
+
+            await authService.UpdatePreferencesAsync(userId, request.Topics);
+            return Ok(new { message = "Preferences updated successfully" });
+        }
         [Authorize]
         [HttpGet]
         public IActionResult AuthenticatedEndpoint()

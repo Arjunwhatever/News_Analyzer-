@@ -1,0 +1,130 @@
+<div class="feed-wrapper">
+  <div class="bg-texture"></div>
+
+  <div class="feed-header">
+    <div class="logo-mark">
+      <svg width="40" height="40" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8"/>
+        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8"/>
+        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <h1 class="headline">live feed</h1>
+    <div class="nav-links">
+      <a routerLink="/home" class="nav-link">← back to analyzer</a>
+      <button class="nav-link btn-link" (click)="openPreferences()">⚙️ customize feed</button>
+    </div>
+  </div>
+
+  <div class="feed-container">
+    <div *ngIf="isLoadingNews" class="loading-state">
+      <div class="dot-loader">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <p>fetching latest headlines...</p>
+    </div>
+
+    <div *ngIf="errorNews" class="error-msg">
+      {{ errorNews }}
+    </div>
+
+    <div *ngIf="!isLoadingNews && !errorNews && articles.length === 0" class="empty-state">
+      No articles found.
+    </div>
+
+    <div class="news-grid" *ngIf="!isLoadingNews && articles.length > 0">
+      <div class="news-card" *ngFor="let article of articles">
+        
+        <div class="card-image" *ngIf="article.imageUrl">
+          <img [src]="article.imageUrl" [alt]="article.title">
+        </div>
+        
+        <div class="card-content">
+          <div class="card-meta">
+            <span class="source-badge">{{ article.sourceName }}</span>
+            <span class="publish-date">{{ article.publishedAt | date:'shortTime' }}</span>
+          </div>
+          
+          <h2 class="article-title">
+            <a [href]="article.url" target="_blank" rel="noopener noreferrer">{{ article.title }}</a>
+          </h2>
+          <p class="article-desc">{{ article.description }}</p>
+
+          <!-- Action or Analysis Result -->
+          <div class="analysis-area">
+            
+            <button 
+              *ngIf="!analysisResults.has(article.url) && !analyzingUrls.has(article.url)"
+              class="analyze-btn" 
+              (click)="analyzeArticle(article.url)">
+              analyze bias
+            </button>
+
+            <div *ngIf="analyzingUrls.has(article.url)" class="analyzing-state">
+              <div class="dot-loader tiny">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              </div>
+              <span>analyzing...</span>
+            </div>
+
+            <div *ngIf="analysisErrors.has(article.url)" class="error-msg tiny">
+              {{ analysisErrors.get(article.url) }}
+              <button class="retry-btn" (click)="analyzeArticle(article.url)">retry</button>
+            </div>
+
+            <!-- The Result Widget -->
+            <div *ngIf="analysisResults.has(article.url)" class="result-widget">
+              <div class="bias-header">
+                <span class="bias-label">{{ analysisResults.get(article.url)!.bias_label }}</span>
+                <span class="bias-score" [style.color]="getBiasColor(analysisResults.get(article.url)!.bias_score)">
+                  {{ analysisResults.get(article.url)!.bias_score > 0 ? '+' : '' }}{{ analysisResults.get(article.url)!.bias_score.toFixed(1) }}
+                </span>
+              </div>
+              
+              <div class="bias-track">
+                <div class="bias-center-line"></div>
+                <div class="bias-needle" 
+                     [style.left.%]="getBiasPosition(analysisResults.get(article.url)!.bias_score)" 
+                     [style.background]="getBiasColor(analysisResults.get(article.url)!.bias_score)">
+                </div>
+              </div>
+              
+              <div class="topics-list small" *ngIf="analysisResults.get(article.url)!.topics?.length">
+                <span class="topic-chip" *ngFor="let topic of analysisResults.get(article.url)!.topics">{{ topic }}</span>
+              </div>
+
+              <!-- Relevance -->
+              <div class="relevance-row-small" *ngIf="analysisResults.get(article.url)!.relevance_score !== undefined && analysisResults.get(article.url)!.relevance_score !== null">
+                <div class="rel-header">
+                  <span class="rel-label">relevance</span>
+                  <span class="rel-pct">{{ analysisResults.get(article.url)!.relevance_score!.toFixed(0) }}%</span>
+                </div>
+                <div class="rel-track">
+                  <div class="rel-fill" [style.width.%]="analysisResults.get(article.url)!.relevance_score"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preferences Modal -->
+  <div class="modal-overlay" *ngIf="showPreferencesModal">
+    <div class="modal-content">
+      <h2>feed preferences</h2>
+      <p>Enter the topics you care about, separated by commas (e.g. AI, Space, Elections).</p>
+      <input type="text" [(ngModel)]="preferencesInput" placeholder="Topics..." class="pref-input" />
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="closePreferences()">cancel</button>
+        <button class="save-btn" (click)="savePreferences()" [disabled]="isSavingPreferences">
+          {{ isSavingPreferences ? 'saving...' : 'save & refresh' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="logout-link" (click)="logout()">log out</button>
+</div>

@@ -26,6 +26,7 @@ namespace Vector.Server.Services
 
             user.Username = request.Username;
             user.PasswordHash = hashedPassword;
+            user.PreferredTopics = request.PreferredTopics;
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
@@ -69,6 +70,22 @@ namespace Vector.Server.Services
             }
             
             return CreateToken(user);
+        }
+
+        public async Task<string?> GetPreferencesAsync(Guid userId)
+        {
+            var user = await context.Users.FindAsync(userId);
+            return user?.PreferredTopics;
+        }
+
+        public async Task UpdatePreferencesAsync(Guid userId, string topics)
+        {
+            var user = await context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.PreferredTopics = topics;
+                await context.SaveChangesAsync();
+            }
         }
     }
 

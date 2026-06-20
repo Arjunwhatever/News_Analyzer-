@@ -60,7 +60,7 @@ describe('FeedComponent', () => {
 
   it('should load preferences on init', () => {
     expect(authServiceSpy.getPreferences).toHaveBeenCalled();
-    expect(component.preferencesInput).toBe('AI');
+    expect(component.selectedTopics.has('AI')).toBe(true);
   });
 
   it('should open and close preferences modal', () => {
@@ -72,7 +72,8 @@ describe('FeedComponent', () => {
   });
 
   it('should save preferences and refresh feed', () => {
-    component.preferencesInput = 'Space';
+    component.selectedTopics.clear();
+    component.selectedTopics.add('Space');
     component.savePreferences();
 
     expect(authServiceSpy.updatePreferences).toHaveBeenCalledWith('Space');

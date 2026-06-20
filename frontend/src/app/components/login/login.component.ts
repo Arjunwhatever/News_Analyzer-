@@ -55,7 +55,7 @@ export class LoginComponent {
           // Success! The backend gave us our cookies. Time to head to the dashboard.
           this.isLoading = false;
           this.cdr.detectChanges();
-          this.router.navigate(['/home']);
+          this.router.navigate(['/feed']);
         },
         error: (err) => {
           // Uh oh, something went wrong. Let the user know what happened.

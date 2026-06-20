@@ -230,3 +230,85 @@ $btn-text:     #e8e4dc;
   letter-spacing: 0.05em;
   transition: color 0.3s ease;
 }
+
+// ── Topics ────────────────────────────────────────────────────
+.topics-group {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.topics-label {
+  font-size: 0.72rem;
+  color: $text-dim;
+  margin-bottom: 0.5rem;
+}
+
+.topics-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topic-chip {
+  background: $surface;
+  border: 1px solid $border;
+  color: $text-dim;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: $surface-2;
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $accent;
+    color: #1a1a1a;
+    border-color: $accent;
+    font-weight: 600;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.custom-topic-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.small-input {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.75rem;
+  flex: 1;
+}
+
+.add-topic-btn {
+  background: $surface;
+  border: 1px solid $border;
+  color: $text-primary;
+  border-radius: 6px;
+  padding: 0 0.8rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: $surface-2;
+    border-color: $accent;
+    color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

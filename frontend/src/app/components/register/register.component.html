@@ -37,9 +37,24 @@
         [disabled]="isLoading" (keyup.enter)="register()" />
     </div>
 
-    <div class="form-group">
-      <input type="text" class="form-input" placeholder="Topics (e.g. AI, Space, Tech)" [(ngModel)]="preferredTopics"
-        [disabled]="isLoading" (keyup.enter)="register()" />
+    <div class="form-group topics-group">
+      <p class="topics-label">Select your preferred topics:</p>
+      <div class="topics-chips">
+        <button 
+          *ngFor="let topic of availableTopics" 
+          class="topic-chip" 
+          [class.active]="selectedTopics.has(topic)"
+          (click)="toggleTopic(topic)"
+          [disabled]="isLoading"
+        >
+          {{ topic }}
+        </button>
+      </div>
+      <div class="custom-topic-input">
+        <input type="text" class="form-input small-input" placeholder="Search topics" [(ngModel)]="customTopic"
+          [disabled]="isLoading" (keyup.enter)="addCustomTopic()" />
+        <button class="add-topic-btn" (click)="addCustomTopic()" [disabled]="isLoading || !customTopic.trim()">Add</button>
+      </div>
     </div>
 
     <button class="register-btn" [disabled]="isLoading" (click)="register()">

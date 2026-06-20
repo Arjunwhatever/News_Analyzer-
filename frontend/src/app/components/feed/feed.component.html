@@ -115,8 +115,23 @@
   <div class="modal-overlay" *ngIf="showPreferencesModal">
     <div class="modal-content">
       <h2>feed preferences</h2>
-      <p>Enter the topics you care about, separated by commas (e.g. AI, Space, Elections).</p>
-      <input type="text" [(ngModel)]="preferencesInput" placeholder="Topics..." class="pref-input" />
+      <p>Select the topics you care about:</p>
+      <div class="topics-chips">
+        <button 
+          *ngFor="let topic of availableTopics" 
+          class="topic-chip" 
+          [class.active]="selectedTopics.has(topic)"
+          (click)="toggleTopic(topic)"
+          [disabled]="isSavingPreferences"
+        >
+          {{ topic }}
+        </button>
+      </div>
+      <div class="custom-topic-input">
+        <input type="text" class="form-input small-input" placeholder="Search topics" [(ngModel)]="customTopic"
+          [disabled]="isSavingPreferences" (keyup.enter)="addCustomTopic()" />
+        <button class="add-topic-btn" (click)="addCustomTopic()" [disabled]="isSavingPreferences || !customTopic.trim()">Add</button>
+      </div>
       <div class="modal-actions">
         <button class="cancel-btn" (click)="closePreferences()">cancel</button>
         <button class="save-btn" (click)="savePreferences()" [disabled]="isSavingPreferences">

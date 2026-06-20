@@ -29,7 +29,9 @@ export class FeedComponent implements OnInit {
 
   // Preferences state
   showPreferencesModal = false;
-  preferencesInput = '';
+  availableTopics: string[] = ['Technology', 'Business', 'Politics', 'Science', 'Sports', 'Entertainment', 'Health', 'AI', 'Space'];
+  selectedTopics: Set<string> = new Set<string>();
+  customTopic: string = '';
   isSavingPreferences = false;
 
   private destroyRef = inject(DestroyRef);
@@ -50,7 +52,10 @@ export class FeedComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.preferencesInput = res.topics || '';
+          this.selectedTopics.clear();
+          if (res.topics) {
+            res.topics.split(',').map(t => t.trim()).filter(t => t).forEach(t => this.selectedTopics.add(t));
+          }
           this.cdr.detectChanges();
         }
       });
@@ -60,13 +65,34 @@ export class FeedComponent implements OnInit {
     this.showPreferencesModal = true;
   }
 
+  toggleTopic(topic: string) {
+    if (this.selectedTopics.has(topic)) {
+      this.selectedTopics.delete(topic);
+    } else {
+      this.selectedTopics.add(topic);
+    }
+  }
+
+  addCustomTopic() {
+    const topic = this.customTopic.trim();
+    if (topic) {
+      const formattedTopic = topic.charAt(0).toUpperCase() + topic.slice(1);
+      if (!this.availableTopics.includes(formattedTopic)) {
+        this.availableTopics.push(formattedTopic);
+      }
+      this.selectedTopics.add(formattedTopic);
+      this.customTopic = '';
+    }
+  }
+
   closePreferences() {
     this.showPreferencesModal = false;
   }
 
   savePreferences() {
     this.isSavingPreferences = true;
-    this.authService.updatePreferences(this.preferencesInput)
+    const preferredTopicsStr = Array.from(this.selectedTopics).join(', ');
+    this.authService.updatePreferences(preferredTopicsStr)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

@@ -13,7 +13,7 @@ describe('RegisterComponent', () => {
   let routerSpy: any;
 
   beforeEach(async () => {
-    authServiceSpy = { register: vi.fn() };
+    authServiceSpy = { register: vi.fn(), login: vi.fn() };
     routerSpy = { navigate: vi.fn() };
 
     await TestBed.configureTestingModule({
@@ -68,17 +68,39 @@ describe('RegisterComponent', () => {
     expect(authServiceSpy.register).not.toHaveBeenCalled();
   });
 
-  it('should call register on authService and navigate on success', () => {
+  it('should call register and then login on success, navigating to feed', () => {
     component.email = 'test@example.com';
     component.password = 'StrongPass123!';
     component.confirmPassword = 'StrongPass123!';
-    component.preferredTopics = 'AI, Space';
+    component.selectedTopics.clear();
+    component.selectedTopics.add('AI');
+    component.selectedTopics.add('Space');
     
     authServiceSpy.register.mockReturnValue(of({}));
+    authServiceSpy.login.mockReturnValue(of({}));
 
     component.register();
 
     expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'StrongPass123!', 'AI, Space');
+    expect(authServiceSpy.login).toHaveBeenCalledWith('test@example.com', 'StrongPass123!');
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/feed']);
+  });
+
+  it('should navigate to login if auto-login fails after registration', () => {
+    component.email = 'test@example.com';
+    component.password = 'StrongPass123!';
+    component.confirmPassword = 'StrongPass123!';
+    component.selectedTopics.clear();
+    component.selectedTopics.add('AI');
+    component.selectedTopics.add('Space');
+    
+    authServiceSpy.register.mockReturnValue(of({}));
+    authServiceSpy.login.mockReturnValue(throwError(() => new Error('Login failed')));
+
+    component.register();
+
+    expect(authServiceSpy.register).toHaveBeenCalledWith('test@example.com', 'StrongPass123!', 'AI, Space');
+    expect(authServiceSpy.login).toHaveBeenCalledWith('test@example.com', 'StrongPass123!');
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
   });
 

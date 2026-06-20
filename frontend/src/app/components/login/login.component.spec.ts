@@ -55,7 +55,7 @@ describe('LoginComponent', () => {
 
     expect(component.isLoading).toBe(false);
     expect(authServiceSpy.login).toHaveBeenCalledWith('testuser', 'password123');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/feed']);
   });
 
   it('should handle login error and display error message', () => {

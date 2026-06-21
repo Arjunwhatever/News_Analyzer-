@@ -11,9 +11,23 @@
     </div>
     <h1 class="headline">live feed</h1>
     <div class="nav-links">
+      <div class="time-filter-container">
+        <span class="time-label">{{ timeFilter === 1 ? 'This week' : '< ' + timeFilter + ' weeks' }}</span>
+        <input type="range" class="time-slider" min="1" max="4" step="1" [(ngModel)]="timeFilter" (change)="fetchNews()" [disabled]="isLoadingNews">
+      </div>
       <a routerLink="/home" class="nav-link">← back to analyzer</a>
       <button class="nav-link btn-link" (click)="openPreferences()">customize feed</button>
     </div>
+  </div>
+
+  <div class="category-bar">
+    <button 
+      *ngFor="let cat of topCategories" 
+      class="category-tab" 
+      [class.active]="cat === activeCategory"
+      (click)="selectCategory(cat)">
+      {{ cat }}
+    </button>
   </div>
 
   <div class="feed-container">
@@ -87,7 +101,7 @@
                 </div>
               </div>
 
-              <div class="topics-list small" *ngIf="analysisResults.get(article.url)!.topics?.length">
+              <div class="topics-list small" *ngIf="analysisResults.get(article.url)!.topics.length">
                 <span class="topic-chip" *ngFor="let topic of analysisResults.get(article.url)!.topics">{{ topic
                   }}</span>
               </div>

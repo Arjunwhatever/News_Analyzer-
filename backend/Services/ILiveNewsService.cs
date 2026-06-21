@@ -4,6 +4,6 @@ namespace Vector.Server.Services
 {
     public interface ILiveNewsService
     {
-        Task<List<LiveNewsArticle>> GetTopHeadlinesAsync(string? topics = null);
+        Task<List<LiveNewsArticle>> GetTopHeadlinesAsync(string? topics = null, int weeks = 1);
     }
 }

@@ -69,6 +69,90 @@ $btn-hover:   #5a5a54;
   &:hover { color: $accent; }
 }
 
+.time-filter-container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: rgba($surface, 0.5);
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba($border, 0.5);
+}
+
+.time-label {
+  font-size: 0.65rem;
+  color: $text-muted;
+  letter-spacing: 0.05em;
+  min-width: 60px;
+}
+
+.time-slider {
+  -webkit-appearance: none;
+  width: 80px;
+  height: 2px;
+  background: $border;
+  outline: none;
+  border-radius: 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $accent;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+}
+
+.category-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba($border, 0.5);
+  margin-bottom: 1.5rem;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.category-tab {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &.active {
+    background: rgba($accent, 0.1);
+    color: $accent;
+    border: 1px solid rgba($accent, 0.3);
+  }
+}
+
 .feed-container {
   position: relative;
   z-index: 1;

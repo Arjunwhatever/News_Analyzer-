@@ -22,19 +22,22 @@ namespace Vector.Server.Controller
 
         [HttpGet("live")]
         [Authorize]
-        public async Task<ActionResult<List<LiveNewsArticle>>> GetLiveNews()
+        public async Task<ActionResult<List<LiveNewsArticle>>> GetLiveNews([FromQuery] int weeks = 1, [FromQuery] string? category = null)
         {
             try
             {
-                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                string? topics = null;
+                string? topics = category;
                 
-                if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var userId))
+                if (string.IsNullOrEmpty(topics))
                 {
-                    topics = await _authService.GetPreferencesAsync(userId);
+                    var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var userId))
+                    {
+                        topics = await _authService.GetPreferencesAsync(userId);
+                    }
                 }
 
-                var articles = await _newsService.GetTopHeadlinesAsync(topics);
+                var articles = await _newsService.GetTopHeadlinesAsync(topics, weeks);
                 return Ok(articles);
             }
             catch (Exception ex)

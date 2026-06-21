@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LiveNewsArticle } from '../models/live-news-article';
 
@@ -9,8 +9,11 @@ import { LiveNewsArticle } from '../models/live-news-article';
 export class FeedService {
   private http = inject(HttpClient);
 
-  // Calls our backend which acts as a secure proxy to NewsAPI
-  getLiveNews(): Observable<LiveNewsArticle[]> {
-    return this.http.get<LiveNewsArticle[]>('/api/Feed/live');
+  getLiveNews(weeks: number = 1, category?: string): Observable<LiveNewsArticle[]> {
+    let params = new HttpParams().set('weeks', weeks.toString());
+    if (category && category !== 'Discover') {
+      params = params.set('category', category);
+    }
+    return this.http.get<LiveNewsArticle[]>('/api/Feed/live', { params });
   }
 }

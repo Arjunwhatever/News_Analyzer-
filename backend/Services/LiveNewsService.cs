@@ -19,11 +19,12 @@ namespace Vector.Server.Services
             _http.DefaultRequestHeaders.Add("User-Agent", "VectorNewsAnalyzer/1.0");
         }
 
-        public async Task<List<LiveNewsArticle>> GetTopHeadlinesAsync(string? topics = null)
+        public async Task<List<LiveNewsArticle>> GetTopHeadlinesAsync(string? topics = null, int weeks = 1)
         {
-            var url = string.IsNullOrWhiteSpace(topics)
-                ? $"https://newsapi.org/v2/top-headlines?country=us&apiKey={_apiKey}"
-                : $"https://newsapi.org/v2/everything?q={Uri.EscapeDataString(topics)}&language=en&sortBy=publishedAt&apiKey={_apiKey}";
+            var fromDate = DateTime.UtcNow.AddDays(-7 * weeks).ToString("yyyy-MM-dd");
+            var query = string.IsNullOrWhiteSpace(topics) ? "news" : topics;
+
+            var url = $"https://newsapi.org/v2/everything?qInTitle={Uri.EscapeDataString(query)}&language=en&sortBy=publishedAt&from={fromDate}&apiKey={_apiKey}";
             
             var response = await _http.GetAsync(url);
             response.EnsureSuccessStatusCode();

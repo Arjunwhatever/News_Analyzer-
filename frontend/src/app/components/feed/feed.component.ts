@@ -34,6 +34,13 @@ export class FeedComponent implements OnInit {
   customTopic: string = '';
   isSavingPreferences = false;
 
+  // Time filter state
+  timeFilter: number = 1;
+
+  // Top category bar state
+  topCategories: string[] = ['Discover', 'News', 'World Cup', 'Sports', 'Tech', 'Finance', 'Climate', 'Watch'];
+  activeCategory: string = 'Discover';
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   
@@ -110,7 +117,7 @@ export class FeedComponent implements OnInit {
   fetchNews() {
     this.isLoadingNews = true;
     this.errorNews = null;
-    this.feedService.getLiveNews()
+    this.feedService.getLiveNews(this.timeFilter, this.activeCategory)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -124,6 +131,13 @@ export class FeedComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  selectCategory(category: string) {
+    if (this.activeCategory !== category) {
+      this.activeCategory = category;
+      this.fetchNews();
+    }
   }
 
   analyzeArticle(url: string) {

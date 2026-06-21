@@ -24,6 +24,15 @@ namespace Vector.Server.Services
             var fromDate = DateTime.UtcNow.AddDays(-7 * weeks).ToString("yyyy-MM-dd");
             var query = string.IsNullOrWhiteSpace(topics) ? "news" : topics;
 
+            // If we have multiple comma-separated topics (like user preferences), format them into an OR query
+            if (query.Contains(','))
+            {
+                var parts = query.Split(',')
+                    .Select(p => $"\"{p.Trim()}\"")
+                    .Where(p => p != "\"\"");
+                query = string.Join(" OR ", parts);
+            }
+
             var url = $"https://newsapi.org/v2/everything?qInTitle={Uri.EscapeDataString(query)}&language=en&sortBy=publishedAt&from={fromDate}&apiKey={_apiKey}";
             
             var response = await _http.GetAsync(url);

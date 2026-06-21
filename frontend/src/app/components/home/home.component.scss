@@ -31,13 +31,84 @@ $right-color: #b84a4a;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
 }
 
+@function multiple-box-shadow ($n) {
+  $value: '#{random(2000)}px #{random(2000)}px #FFF';
+  @for $i from 2 through $n {
+    $value: '#{$value} , #{random(2000)}px #{random(2000)}px #FFF';
+  }
+  @return unquote($value);
+}
+
+$shadows-small:  multiple-box-shadow(300);
+$shadows-medium: multiple-box-shadow(100);
+$shadows-big:    multiple-box-shadow(40);
+
 .bg-texture {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(72,68,58,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(58,55,48,0.15) 0%, transparent 55%);
   pointer-events: none;
+  background: radial-gradient(ellipse at bottom, rgba(27, 39, 53, 0.4) 0%, rgba(9, 10, 15, 0.2) 100%);
+  overflow: hidden;
+  z-index: 0;
+
+  .stars1 {
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    box-shadow: $shadows-small;
+    animation: animStar 100s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 1px;
+      height: 1px;
+      background: transparent;
+      box-shadow: $shadows-small;
+    }
+  }
+
+  .stars2 {
+    width: 2px;
+    height: 2px;
+    background: transparent;
+    box-shadow: $shadows-medium;
+    animation: animStar 150s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 2px;
+      height: 2px;
+      background: transparent;
+      box-shadow: $shadows-medium;
+    }
+  }
+
+  .stars3 {
+    width: 3px;
+    height: 3px;
+    background: transparent;
+    box-shadow: $shadows-big;
+    animation: animStar 200s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 3px;
+      height: 3px;
+      background: transparent;
+      box-shadow: $shadows-big;
+    }
+  }
+}
+
+@keyframes animStar {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
 }
 
 // ── Container ─────────────────────────────────────────────────
@@ -122,6 +193,7 @@ $right-color: #b84a4a;
   &:focus {
     border-color: $accent;
     background: $surface-2;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 15px rgba($accent, 0.15);
   }
 
   &:disabled {
@@ -183,7 +255,9 @@ $right-color: #b84a4a;
   min-height: 38px;
 
   &:hover:not(:disabled) {
-    background: $btn-hover;
+    background: lighten($btn-bg, 5%);
+    box-shadow: 0 0 12px rgba($btn-text, 0.15);
+    border-color: rgba($btn-text, 0.3);
   }
 
   &:active:not(:disabled) {
@@ -226,6 +300,17 @@ $right-color: #b84a4a;
   flex-direction: column;
   gap: 1.8rem;
   animation: fadeUp 0.4s ease both;
+
+  > * {
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .bias-section { animation-delay: 0.1s; }
+  .summary-section { animation-delay: 0.2s; }
+  .topics-section { animation-delay: 0.3s; }
+  .confidence-row { animation-delay: 0.4s; }
+  .relevance-row { animation-delay: 0.5s; }
+  .reset-btn { animation-delay: 0.6s; }
 }
 
 // Bias section
@@ -301,14 +386,25 @@ $right-color: #b84a4a;
 .bias-needle {
   position: absolute;
   top: 50%;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   border: 2px solid $bg;
-  box-shadow: 0 0 6px rgba(0,0,0,0.5);
-  transition: left 0.6s cubic-bezier(0.25, 1, 0.5, 1), background 0.4s;
+  box-shadow: 0 0 10px rgba(0,0,0,0.8);
+  transition: left 0.6s cubic-bezier(0.25, 1, 0.5, 1), background 0.4s, box-shadow 0.4s;
   z-index: 2;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: inherit;
+    filter: blur(4px);
+    opacity: 0.5;
+    z-index: -1;
+  }
 }
 
 .bias-desc {
@@ -367,6 +463,13 @@ $right-color: #b84a4a;
   border-radius: 4px;
   font-size: 0.72rem;
   letter-spacing: 0.03em;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    background: lighten($surface-2, 5%);
+  }
 }
 
 // Confidence bar
@@ -441,16 +544,18 @@ $right-color: #b84a4a;
   right: 1.6rem;
   background: none;
   border: none;
-  color: $text-dim;
+  color: rgba($right-color, 0.85); // A bit red
   font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 0.72rem;
+  font-size: 0.85rem; // Bigger
+  font-weight: 500;
   letter-spacing: 0.05em;
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.2s;
   text-decoration: none;
 
   &:hover {
-    color: $text-muted;
+    color: $right-color;
+    transform: scale(1.05);
   }
 }

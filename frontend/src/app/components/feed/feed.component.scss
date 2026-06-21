@@ -20,14 +20,84 @@ $btn-hover:   #5a5a54;
   color: $text-primary;
 }
 
+@function multiple-box-shadow ($n) {
+  $value: '#{random(2000)}px #{random(2000)}px #FFF';
+  @for $i from 2 through $n {
+    $value: '#{$value} , #{random(2000)}px #{random(2000)}px #FFF';
+  }
+  @return unquote($value);
+}
+
+$shadows-small:  multiple-box-shadow(300);
+$shadows-medium: multiple-box-shadow(100);
+$shadows-big:    multiple-box-shadow(40);
+
 .bg-texture {
   position: fixed;
   inset: 0;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(72,68,58,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(58,55,48,0.15) 0%, transparent 55%);
   pointer-events: none;
+  background: radial-gradient(ellipse at bottom, rgba(27, 39, 53, 0.4) 0%, rgba(9, 10, 15, 0.2) 100%);
+  overflow: hidden;
   z-index: 0;
+
+  .stars1 {
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    box-shadow: $shadows-small;
+    animation: animStar 100s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 1px;
+      height: 1px;
+      background: transparent;
+      box-shadow: $shadows-small;
+    }
+  }
+
+  .stars2 {
+    width: 2px;
+    height: 2px;
+    background: transparent;
+    box-shadow: $shadows-medium;
+    animation: animStar 150s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 2px;
+      height: 2px;
+      background: transparent;
+      box-shadow: $shadows-medium;
+    }
+  }
+
+  .stars3 {
+    width: 3px;
+    height: 3px;
+    background: transparent;
+    box-shadow: $shadows-big;
+    animation: animStar 200s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      width: 3px;
+      height: 3px;
+      background: transparent;
+      box-shadow: $shadows-big;
+    }
+  }
+}
+
+@keyframes animStar {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
 }
 
 .feed-header {
@@ -227,6 +297,45 @@ $btn-hover:   #5a5a54;
   font-size: 0.65rem;
   color: $text-muted;
   letter-spacing: 0.1em;
+}
+
+.like-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: $text-muted;
+  transition: all 0.2s;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: 0.5rem;
+  
+  &:hover {
+    color: #e25555;
+    background: rgba(226, 85, 85, 0.1);
+  }
+  
+  &.liked {
+    color: #e25555;
+    .heart-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  .heart-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .topic-hint {
+    font-size: 0.65rem;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+  }
 }
 
 .publish-date {
@@ -443,13 +552,17 @@ $btn-hover:   #5a5a54;
   right: 1.6rem;
   background: none;
   border: none;
-  color: $text-dim;
+  color: rgba(#b84a4a, 0.85); // Matches $right-color from home
   font-family: inherit;
-  font-size: 0.72rem;
+  font-size: 0.85rem; // Bigger
+  font-weight: 500;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: color 0.2s;
-  &:hover { color: $text-muted; }
+  transition: color 0.2s, transform 0.2s;
+  &:hover { 
+    color: #b84a4a;
+    transform: scale(1.05);
+  }
 }
 
 /* Dots Loader */

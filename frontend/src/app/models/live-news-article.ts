@@ -5,4 +5,5 @@ export interface LiveNewsArticle {
   imageUrl: string;
   sourceName: string;
   publishedAt: string;
+  topic?: string;
 }

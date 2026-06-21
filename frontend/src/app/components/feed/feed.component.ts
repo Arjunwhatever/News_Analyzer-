@@ -38,7 +38,7 @@ export class FeedComponent implements OnInit {
   timeFilter: number = 1;
 
   // Top category bar state
-  topCategories: string[] = ['Discover', 'News', 'World Cup', 'Sports', 'Tech', 'Finance', 'Climate', 'Watch'];
+  topCategories: string[] = ['Discover', 'News', 'World Cup', 'Sports', 'Tech', 'Finance', 'Climate', 'Celebrities'];
   activeCategory: string = 'Discover';
 
   private destroyRef = inject(DestroyRef);
@@ -96,7 +96,7 @@ export class FeedComponent implements OnInit {
     this.showPreferencesModal = false;
   }
 
-  savePreferences() {
+  savePreferences(skipFetch: boolean = false) {
     this.isSavingPreferences = true;
     const preferredTopicsStr = Array.from(this.selectedTopics).join(', ');
     this.authService.updatePreferences(preferredTopicsStr)
@@ -105,13 +105,38 @@ export class FeedComponent implements OnInit {
         next: () => {
           this.isSavingPreferences = false;
           this.showPreferencesModal = false;
-          this.fetchNews(); // Refresh feed with new topics
+          if (!skipFetch) {
+            this.fetchNews(); // Refresh feed with new topics
+          } else {
+            this.cdr.detectChanges();
+          }
         },
         error: () => {
           this.isSavingPreferences = false;
           this.cdr.detectChanges();
         }
       });
+  }
+
+  toggleLike(article: LiveNewsArticle, event: Event) {
+    event.stopPropagation();
+    if (!article.topic) return;
+
+    const topic = article.topic.charAt(0).toUpperCase() + article.topic.slice(1).toLowerCase();
+    if (this.selectedTopics.has(topic)) {
+      this.selectedTopics.delete(topic);
+    } else {
+      this.selectedTopics.add(topic);
+    }
+    
+    // Auto-save when liked from feed, don't refresh feed
+    this.savePreferences(true);
+  }
+
+  isLiked(article: LiveNewsArticle): boolean {
+    if (!article.topic) return false;
+    const topic = article.topic.charAt(0).toUpperCase() + article.topic.slice(1).toLowerCase();
+    return this.selectedTopics.has(topic);
   }
 
   fetchNews() {

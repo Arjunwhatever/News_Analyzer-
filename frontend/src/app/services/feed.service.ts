@@ -11,7 +11,7 @@ export class FeedService {
 
   getLiveNews(weeks: number = 1, category?: string): Observable<LiveNewsArticle[]> {
     let params = new HttpParams().set('weeks', weeks.toString());
-    if (category && category !== 'Discover') {
+    if (category) {
       params = params.set('category', category);
     }
     return this.http.get<LiveNewsArticle[]>('/api/Feed/live', { params });

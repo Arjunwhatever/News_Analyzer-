@@ -5,31 +5,34 @@
     <div class="stars3"></div>
   </div>
 
-  <div class="feed-header">
-    <div class="logo-mark">
-      <svg width="40" height="40" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8" />
-        <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8" />
-        <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5" />
-      </svg>
+  <!-- Sticky Top Nav Bar -->
+  <div class="top-nav-bar">
+    <div class="nav-left">
+      <div class="logo-mark">
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="9" width="36" height="1.5" fill="#c8c4b8" />
+          <rect x="12" y="14" width="28" height="1.5" fill="#c8c4b8" />
+          <polygon points="26,48 4,12 48,12" fill="none" stroke="#c8c4b8" stroke-width="1.5" />
+        </svg>
+      </div>
+      <h1 class="headline">live feed</h1>
     </div>
-    <h1 class="headline">live feed</h1>
-    <div class="nav-links">
+
+    <div class="nav-center category-bar">
+      <button *ngFor="let cat of topCategories" class="category-tab" [class.active]="cat === activeCategory"
+        (click)="selectCategory(cat)">
+        {{ cat }}
+      </button>
+    </div>
+
+    <div class="nav-right">
       <div class="time-filter-container">
         <span class="time-label">{{ timeFilter === 1 ? 'This week' : '< ' + timeFilter + ' weeks' }}</span>
-            <input type="range" class="time-slider" min="1" max="4" step="1" [(ngModel)]="timeFilter"
-              (change)="fetchNews()" [disabled]="isLoadingNews">
+        <input type="range" class="time-slider" min="1" max="4" step="1" [(ngModel)]="timeFilter"
+          (change)="fetchNews()" [disabled]="isLoadingNews">
       </div>
-      <a routerLink="/home" class="nav-link">Analyzer</a>
-      <button class="nav-link btn-link" (click)="openPreferences()">customize feed</button>
+      <button class="nav-link btn-link" (click)="openPreferences()">customize</button>
     </div>
-  </div>
-
-  <div class="category-bar">
-    <button *ngFor="let cat of topCategories" class="category-tab" [class.active]="cat === activeCategory"
-      (click)="selectCategory(cat)">
-      {{ cat }}
-    </button>
   </div>
 
   <div class="feed-container">
@@ -157,6 +160,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Analyzer Button -->
+  <a routerLink="/home" class="fab-analyzer">
+    <span class="fab-icon">✦</span>
+    <span>Analyzer</span>
+  </a>
 
   <button class="logout-link" (click)="logout()">log out</button>
 </div>

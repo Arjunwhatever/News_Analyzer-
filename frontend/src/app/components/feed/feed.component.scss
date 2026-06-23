@@ -14,12 +14,17 @@ $btn-hover:   #5a5a54;
 .feed-wrapper {
   min-height: 100vh;
   background-color: $bg;
-  padding: 2rem 1rem;
+  padding: 0 0 2rem 0; // Removed top padding since navbar is sticky
   position: relative;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   color: $text-primary;
 }
 
+// =========================================================================
+// SCSS Particle Starfield Generation
+// =========================================================================
+// This function generates a massive single box-shadow string of random X, Y coordinates.
+// It evaluates at compile-time to output pure CSS, creating hundreds of stars without JS.
 @function multiple-box-shadow ($n) {
   $value: '#{random(2000)}px #{random(2000)}px #FFF';
   @for $i from 2 through $n {
@@ -47,6 +52,9 @@ $shadows-big:    multiple-box-shadow(40);
     box-shadow: $shadows-small;
     animation: animStar 100s linear infinite;
 
+    // The :after pseudo-element creates an identical copy of the starfield exactly 
+    // 2000px below the original. When the animation translates the original up by 2000px, 
+    // this copy slides perfectly into view, creating an infinite, seamless loop.
     &:after {
       content: " ";
       position: absolute;
@@ -100,28 +108,50 @@ $shadows-big:    multiple-box-shadow(40);
   to { transform: translateY(-2000px); }
 }
 
-.feed-header {
-  position: relative;
-  z-index: 1;
-  max-width: 800px;
-  margin: 0 auto 2rem;
+.top-nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba($bg-dark, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba($accent, 0.1);
+  margin-bottom: 2rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .logo-mark svg {
+    display: block;
+  }
 }
 
 .headline {
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   font-weight: 400;
   letter-spacing: 0.25em;
   color: $accent;
   margin: 0;
 }
 
-.nav-links {
+.nav-center.category-bar {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.nav-right {
+  display: flex;
+  gap: 1.5rem;
   align-items: center;
 }
 
@@ -186,19 +216,7 @@ $shadows-big:    multiple-box-shadow(40);
   }
 }
 
-.category-bar {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 2rem;
-  overflow-x: auto;
-  border-bottom: 1px solid rgba($border, 0.5);
-  margin-bottom: 1.5rem;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
+// Replaced category bar layout since it's now embedded in .top-nav-bar
 
 .category-tab {
   background: transparent;
@@ -549,12 +567,12 @@ $shadows-big:    multiple-box-shadow(40);
 .logout-link {
   position: fixed;
   bottom: 1.4rem;
-  right: 1.6rem;
+  left: 1.6rem; // Moved to bottom-left so it doesn't collide with the FAB
   background: none;
   border: none;
-  color: rgba(#b84a4a, 0.85); // Matches $right-color from home
+  color: rgba(#b84a4a, 0.85);
   font-family: inherit;
-  font-size: 0.85rem; // Bigger
+  font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -562,6 +580,37 @@ $shadows-big:    multiple-box-shadow(40);
   &:hover { 
     color: #b84a4a;
     transform: scale(1.05);
+  }
+}
+
+.fab-analyzer {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: $accent;
+  color: $bg-dark;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 15px rgba($accent, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  z-index: 100;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 20px rgba($accent, 0.4);
+  }
+
+  .fab-icon {
+    font-size: 1.2rem;
+    line-height: 1;
   }
 }
 

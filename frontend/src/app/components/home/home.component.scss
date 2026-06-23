@@ -31,6 +31,11 @@ $right-color: #b84a4a;
   font-family: 'JetBrains Mono', 'Courier New', monospace;
 }
 
+// =========================================================================
+// SCSS Particle Starfield Generation
+// =========================================================================
+// This function generates a massive single box-shadow string of random X, Y coordinates.
+// It evaluates at compile-time to output pure CSS, creating hundreds of stars without JS.
 @function multiple-box-shadow ($n) {
   $value: '#{random(2000)}px #{random(2000)}px #FFF';
   @for $i from 2 through $n {
@@ -58,6 +63,9 @@ $shadows-big:    multiple-box-shadow(40);
     box-shadow: $shadows-small;
     animation: animStar 100s linear infinite;
 
+    // The :after pseudo-element creates an identical copy of the starfield exactly 
+    // 2000px below the original. When the animation translates the original up by 2000px, 
+    // this copy slides perfectly into view, creating an infinite, seamless loop.
     &:after {
       content: " ";
       position: absolute;

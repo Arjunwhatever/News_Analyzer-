@@ -244,8 +244,9 @@ $shadows-big:    multiple-box-shadow(40);
 .feed-container {
   position: relative;
   z-index: 1;
-  max-width: 800px;
+  max-width: 1200px; // Expanded to fit multiple tiles
   margin: 0 auto;
+  padding: 0 2rem; // Side padding for smaller screens
 }
 
 .loading-state, .empty-state {
@@ -257,9 +258,9 @@ $shadows-big:    multiple-box-shadow(40);
 }
 
 .news-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
 }
 
 .news-card {
@@ -269,10 +270,13 @@ $shadows-big:    multiple-box-shadow(40);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  height: 100%; // Stretch to match other tiles in the row
   
   &:hover {
     border-color: rgba($accent, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   }
 }
 
@@ -299,6 +303,7 @@ $shadows-big:    multiple-box-shadow(40);
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  flex: 1; // Pushes bottom content down to unify tile heights
 }
 
 .card-meta {
@@ -386,7 +391,7 @@ $shadows-big:    multiple-box-shadow(40);
 
 /* Analysis Area */
 .analysis-area {
-  margin-top: 0.5rem;
+  margin-top: auto; // Pushes the analysis section to the bottom of the card
   padding-top: 1rem;
   border-top: 1px dashed $border;
 }

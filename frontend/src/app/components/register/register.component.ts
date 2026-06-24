@@ -18,6 +18,7 @@ export class RegisterComponent {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  showTopicsModal = false;
   availableTopics: string[] = ['Technology', 'Business', 'Politics', 'Science', 'Sports', 'Entertainment', 'Health', 'AI', 'Space'];
   selectedTopics: Set<string> = new Set<string>();
   customTopic: string = '';

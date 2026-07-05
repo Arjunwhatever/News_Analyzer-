@@ -30,7 +30,7 @@ namespace Vector.Server.Tests.Services
         }
 
         [Fact]
-        public async Task GetTopHeadlinesAsync_NullTopics_CallsTopHeadlinesEndpoint()
+        public async Task GetTopHeadlinesAsync_NullTopics_CallsEverythingEndpointWithNewsQuery()
         {
             // Arrange
             var jsonResponse = @"{
@@ -46,7 +46,7 @@ namespace Vector.Server.Tests.Services
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req => 
                         req.Method == HttpMethod.Get && 
-                        req.RequestUri!.ToString().StartsWith("https://newsapi.org/v2/top-headlines")),
+                        req.RequestUri!.ToString().StartsWith("https://newsapi.org/v2/everything")),
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Vector.Server.Entities;
 
 namespace Vector.Server.Data
@@ -7,5 +7,7 @@ namespace Vector.Server.Data
         : DbContext(options)
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<AnalysisRecord> AnalysisRecords { get; set; }
+        public DbSet<NewsSource> NewsSources { get; set; }
     }
 }

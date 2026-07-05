@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
-import { AnalysisService } from '../../services/analysis.service';
+import { AnalysisService, SourceBiasStat } from '../../services/analysis.service';
 import { AnalysisResult } from '../../models/analysis-result';
 
 @Component({
@@ -21,6 +21,9 @@ export class HomeComponent {
   result: AnalysisResult | null = null;
   error: string | null = null;
 
+  sourceStats: SourceBiasStat[] = [];
+  isLoadingStats: boolean = false;
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -30,6 +33,28 @@ export class HomeComponent {
 
   logout() {
     this.authService.logout();
+  }
+
+  ngOnInit() {
+    this.fetchSourceStats();
+  }
+
+  fetchSourceStats() {
+    this.isLoadingStats = true;
+    this.analysisService.getSourceBiasStats()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (stats) => {
+          this.sourceStats = stats.filter(s => s.sourceName !== 'Direct Text');
+          this.isLoadingStats = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to fetch source stats', err);
+          this.isLoadingStats = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   get isUrl(): boolean {
@@ -73,6 +98,26 @@ export class HomeComponent {
     return 'strongly right';
   }
 
+  getSourceBiasColor(score: number): string {
+    if (score < -4) return '#4a90d9';
+    if (score > 4) return '#c0392b';
+    return '#8a8a6a';
+  }
+
+  getSourceBiasPosition(score: number): number {
+    return ((score + 10) / 20) * 100;
+  }
+
+  getSourceBiasDescription(s: number): string {
+    if (s <= -7) return 'strongly left';
+    if (s <= -4) return 'left leaning';
+    if (s <= -1) return 'slightly left';
+    if (s < 1)  return 'center / neutral';
+    if (s < 4)  return 'slightly right';
+    if (s < 7)  return 'right leaning';
+    return 'strongly right';
+  }
+
   // The big green button! Fires off the text to the backend and waits for the AI's verdict.
   analyze() {
     if (!this.inputIsValid || this.isLoading) return;
@@ -88,6 +133,7 @@ export class HomeComponent {
           // Boom, we got the results! Update the UI to show the fancy charts.
           this.result = data;
           this.isLoading = false;
+          this.fetchSourceStats(); // Refresh the dashboard
           this.cdr.detectChanges();
         },
         error: (err) => {

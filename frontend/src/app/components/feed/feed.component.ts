@@ -38,7 +38,7 @@ export class FeedComponent implements OnInit {
   timeFilter: number = 1;
 
   // Top category bar state
-  topCategories: string[] = ['Discover', 'News', 'World Cup', 'Sports', 'Tech', 'Finance', 'Climate', 'Celebrities'];
+  topCategories: string[] = ['Discover', 'News', 'Politics', 'World Cup', 'Sports', 'Tech', 'Finance', 'Climate', 'Celebrities'];
   activeCategory: string = 'Discover';
 
   private destroyRef = inject(DestroyRef);

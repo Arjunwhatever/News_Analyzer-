@@ -13,6 +13,7 @@ namespace Vector.Server.Tests.Services
     {
         private readonly Mock<HttpMessageHandler> _handlerMock;
         private readonly Mock<IConfiguration> _configMock;
+        private readonly Mock<Microsoft.Extensions.Logging.ILogger<BiasAnalyzerService>> _loggerMock;
         private readonly HttpClient _httpClient;
 
         public BiasAnalyzerServiceTests()
@@ -24,11 +25,12 @@ namespace Vector.Server.Tests.Services
             var configSectionMock = new Mock<IConfigurationSection>();
             configSectionMock.Setup(s => s.Value).Returns("fake-api-key");
             _configMock.Setup(c => c.GetSection("AppSettings:OpenRouterApiKey")).Returns(configSectionMock.Object);
+            _loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<BiasAnalyzerService>>();
         }
 
         private BiasAnalyzerService CreateService()
         {
-            return new BiasAnalyzerService(_httpClient, _configMock.Object);
+            return new BiasAnalyzerService(_httpClient, _configMock.Object, _loggerMock.Object);
         }
 
         [Fact]

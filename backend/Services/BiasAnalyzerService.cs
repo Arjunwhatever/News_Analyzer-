@@ -8,11 +8,13 @@ namespace Vector.Server.Services
 {
     public class BiasAnalyzerService
     {
-        // Google Gemma 4 31B — Free model with decent output 
-        private const string Model = "google/gemma-4-31b-it:free";
-        private const string ApiBase = "https://openrouter.ai/api/v1/chat/completions";
+        // Use Gemini 3.5 Flash natively via Google's own API
+        private const string Model = "gemini-3.5-flash";
+        private const string ApiBase = "https://generativelanguage.googleapis.com/v1beta/models";
 
         private readonly HttpClient _http;
+        private readonly ILogger<BiasAnalyzerService> _logger;
+        private readonly string _apiKey;
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -20,15 +22,13 @@ namespace Vector.Server.Services
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        public BiasAnalyzerService(HttpClient http, IConfiguration configuration)
+        public BiasAnalyzerService(HttpClient http, IConfiguration configuration, ILogger<BiasAnalyzerService> logger)
         {
             _http = http;
-            var apiKey = configuration.GetValue<string>("AppSettings:OpenRouterApiKey") 
-                ?? throw new InvalidOperationException("OpenRouter API key is not configured in AppSettings:OpenRouterApiKey.");
+            _logger = logger;
+            _apiKey = configuration.GetValue<string>("AppSettings:GoogleApiKey") 
+                ?? throw new InvalidOperationException("Google API key is not configured in AppSettings:GoogleApiKey.");
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            _http.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/political-bias-analyzer");
-            _http.DefaultRequestHeaders.Add("X-Title", "Political Bias Analyzer");
             _http.Timeout = TimeSpan.FromSeconds(90);
         }
 
@@ -39,32 +39,126 @@ namespace Vector.Server.Services
 
             var requestBody = new
             {
-                model = Model,
-                messages = new[]
+                systemInstruction = new 
                 {
-                    new { role = "system", content = SystemPrompt(userTopics) },
-                    new { role = "user",   content = prompt }
+                    parts = new[] { new { text = SystemPrompt(userTopics) } }
                 },
-                temperature = 0.2,   // Low temperature for consistent scoring
-                max_tokens  = 800
+                contents = new[]
+                {
+                    new 
+                    {
+                        parts = new[] { new { text = prompt } }
+                    }
+                },
+                generationConfig = new
+                {
+                    temperature = 0.3,
+                    maxOutputTokens = 4000,
+                    responseMimeType = "application/json"
+                }
             };
 
             var json    = JsonSerializer.Serialize(requestBody, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"{ApiBase}/{Model}:generateContent?key={_apiKey}";
 
-            var response = await _http.PostAsync(ApiBase, content);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
+                var response = await _http.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var tempJson = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var result = ParseResponse(tempJson, Model);
+                        _logger.LogInformation("Successfully parsed LLM Response from {Model}", Model);
+                        return result;
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        _logger.LogWarning("Model {Model} returned invalid JSON: {Error}", Model, ex.Message);
+                        throw new HttpRequestException("Gemini returned invalid JSON. Try again.", ex);
+                    }
+                }
+
                 var errorBody = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException(
-                    $"OpenRouter returned {(int)response.StatusCode} {response.ReasonPhrase}. " +
-                    $"Details: {errorBody}");
+                _logger.LogError("Model {Model} failed with {StatusCode}: {ErrorBody}", Model, response.StatusCode, errorBody);
+                throw new HttpRequestException($"Gemini failed to process the request: {response.StatusCode}");
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogError("Model {Model} timed out.", Model);
+                throw new HttpRequestException("The request to Gemini timed out.");
+            }
+        }
+
+        public async Task<(double biasScore, string description)> AnalyzeSourceHistoricalBiasAsync(string sourceName)
+        {
+            var prompt = $"Based on your general knowledge, what is the established historical political bias of the news publisher '{sourceName}'? Provide a very brief 1-sentence description and a bias score from -10 to 10 (where -10 is far-left, 0 is neutral, and 10 is far-right). Respond ONLY in valid JSON with this exact schema:\n{{\n  \"biasScore\": <number>,\n  \"description\": \"<1 sentence description>\"\n}}";
+
+
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                    new 
+                    {
+                        parts = new[] { new { text = prompt } }
+                    }
+                },
+                generationConfig = new
+                {
+                    temperature = 0.3,
+                    maxOutputTokens = 4000,
+                    responseMimeType = "application/json"
+                }
+            };
+
+            var json = JsonSerializer.Serialize(requestBody, _jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var url = $"{ApiBase}/{Model}:generateContent?key={_apiKey}";
+
+            try
+            {
+                var response = await _http.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var tempJson = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var geminiResp = JsonSerializer.Deserialize<JsonElement>(tempJson, _jsonOptions);
+                        var rawContent = geminiResp
+                            .GetProperty("candidates")[0]
+                            .GetProperty("content")
+                            .GetProperty("parts")[0]
+                            .GetProperty("text")
+                            .GetString() ?? "{}";
+
+                        var cleaned = StripMarkdownFences(rawContent.Trim());
+                        var parsed = JsonSerializer.Deserialize<JsonElement>(cleaned, _jsonOptions);
+                        var score = parsed.TryGetProperty("biasScore", out var scoreProp) ? scoreProp.GetDouble() : 0.0;
+                        var desc = parsed.TryGetProperty("description", out var descProp) ? descProp.GetString() : "Established bias";
+                        return (Math.Clamp(Math.Round(score, 1), -10.0, 10.0), desc ?? "Established bias");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning("Model {Model} returned invalid JSON for source history: {Error}", Model, ex.Message);
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogWarning("Model {Model} timed out for source history.", Model);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogWarning("Model {Model} threw HTTP exception for source history: {Error}", Model, ex.Message);
             }
 
-            // Grab the JSON string the AI spat back and parse it into our clean C# object
-            var responseJson = await response.Content.ReadAsStringAsync();
-            return ParseResponse(responseJson);
+            _logger.LogWarning("Failed to evaluate source {SourceName}. Returning 0.0", sourceName);
+            return (0.0, "Established bias");
         }
 
        
@@ -81,7 +175,7 @@ namespace Vector.Server.Services
             You are an expert political media analyst. Your job is to evaluate the political bias
             of news articles and produce structured analysis in JSON format only.
 
-            Scoring guidelines (bias_score):
+            Scoring guidelines (biasScore):
               -10 to -8  : Far-left / socialist / progressive extremism
               -7  to -5  : Strong left-wing / liberal framing
               -4  to -2  : Moderate left / center-left lean
@@ -124,19 +218,24 @@ namespace Vector.Server.Services
         }
 
         // Deserializes the raw LLM response string into our structured AnalysisResult object
-        private AnalysisResult ParseResponse(string responseJson)
+        private AnalysisResult ParseResponse(string responseJson, string modelUsed)
         {
-            var openRouterResp = JsonSerializer.Deserialize<OpenRouterResponse>(responseJson, _jsonOptions)
-                ?? throw new InvalidOperationException("Empty response from API.");
-
-            var message = openRouterResp.Choices?.FirstOrDefault()?.Message;
-
-            // Primary: read from content. Fallback: read from reasoning
-            // (some free models are reasoning-only and put output in the reasoning field)
-            var rawContent = message?.Content
-                ?? message?.Reasoning
-                ?? throw new InvalidOperationException(
-                    $"No message content in API response. Raw JSON: {responseJson[..Math.Min(500, responseJson.Length)]}");
+            var geminiResp = JsonSerializer.Deserialize<JsonElement>(responseJson, _jsonOptions);
+            string rawContent;
+            
+            try 
+            {
+                rawContent = geminiResp
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString() ?? "{}";
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to extract text from Gemini response. Raw JSON: {responseJson[..Math.Min(500, responseJson.Length)]}. Error: {ex.Message}");
+            }
 
             // Strip potential markdown fences the model might include despite instructions
             var cleaned = StripMarkdownFences(rawContent.Trim());
@@ -166,7 +265,7 @@ namespace Vector.Server.Services
                 Summary       = payload.Summary,
                 Topics        = payload.Topics,
                 RelevanceScore = payload.RelevanceScore,
-                ModelUsed     = Model
+                ModelUsed     = modelUsed
             };
         }
 

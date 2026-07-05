@@ -118,6 +118,37 @@
       </button>
     </div>
 
+    <!-- Source Bias Dashboard -->
+    <div class="dashboard-card" *ngIf="!result && sourceStats.length > 0">
+      <div class="dash-header">
+        <h2 class="dash-title">source bias tracker</h2>
+        <p class="dash-subtitle">established historical bias of tracked publishers</p>
+      </div>
+      
+      <div class="source-list">
+        <div class="source-row" *ngFor="let stat of sourceStats">
+          <div class="source-row-top">
+            <div class="source-info">
+              <span class="source-name">{{ stat.sourceName }}</span>
+              <span class="source-count">{{ stat.articleCount }} {{ stat.articleCount === 1 ? 'article' : 'articles' }}</span>
+            </div>
+            <div class="source-bias-track">
+              <div class="source-bias-center"></div>
+              <div class="source-bias-needle" 
+                   [style.left.%]="getSourceBiasPosition(stat.averageBias)"
+                   [style.background]="getSourceBiasColor(stat.averageBias)"></div>
+            </div>
+            <div class="source-score" [style.color]="getSourceBiasColor(stat.averageBias)">
+              {{ getSourceBiasDescription(stat.averageBias) }}
+            </div>
+          </div>
+          <div class="source-description" *ngIf="stat.description">
+            {{ stat.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Logout — bottom-right, styled like "forgot password?" -->

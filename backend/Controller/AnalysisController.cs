@@ -11,7 +11,8 @@ namespace Vector.Server.Controller
     public class AnalysisController(
         BiasAnalyzerService biasAnalyzerService,
         ArticleScraperService articleScraperService,
-        IAuthService authService) : ControllerBase
+        IAuthService authService,
+        Vector.Server.Data.UserDbContext dbContext) : ControllerBase
     {
         // The main brain of the API! This endpoint accepts an article URL or text payload, extracts the content, and passes it to the AI for bias scoring.
         [HttpPost("analyze")]
@@ -55,6 +56,59 @@ namespace Vector.Server.Controller
 
                 // Once we have a decent chunk of text, we hand it off to the Bias Analyzer Service to do the heavy lifting!
                 var result = await biasAnalyzerService.AnalyzeAsync(articleText, userTopics);
+
+                // Save to historical records
+                var sourceName = "Unknown";
+                if (!string.IsNullOrWhiteSpace(request.Url))
+                {
+                    try
+                    {
+                        var uri = new Uri(request.Url);
+                        sourceName = uri.Host.Replace("www.", "");
+                    }
+                    catch { }
+                }
+                else
+                {
+                    sourceName = "Direct Text";
+                }
+
+                if (sourceName != "Direct Text" && sourceName != "Unknown")
+                {
+                    // Check if we already have this source evaluated
+                    var existingSource = dbContext.NewsSources.FirstOrDefault(s => s.SourceName == sourceName);
+                    if (existingSource == null)
+                    {
+                        var (sourceBiasScore, sourceDesc) = await biasAnalyzerService.AnalyzeSourceHistoricalBiasAsync(sourceName);
+                        existingSource = new Vector.Server.Entities.NewsSource
+                        {
+                            SourceName = sourceName,
+                            HistoricalBiasScore = sourceBiasScore,
+                            Description = sourceDesc,
+                            ArticleCount = 1,
+                            LastEvaluatedAt = DateTime.UtcNow
+                        };
+                        dbContext.NewsSources.Add(existingSource);
+                    }
+                    else
+                    {
+                        existingSource.ArticleCount++;
+                    }
+                }
+
+                var record = new Vector.Server.Entities.AnalysisRecord
+                {
+                    SourceName = sourceName,
+                    ArticleUrl = request.Url ?? "N/A",
+                    ArticleTitle = "Unknown Title", // Future enhancement: extract title during scraping
+                    BiasScore = result.BiasScore,
+                    BiasLabel = result.BiasLabel,
+                    AnalyzedAt = DateTime.UtcNow
+                };
+
+                dbContext.AnalysisRecords.Add(record);
+                await dbContext.SaveChangesAsync();
+
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
@@ -65,6 +119,23 @@ namespace Vector.Server.Controller
             {
                 return StatusCode(500, $"An error occurred during analysis: {ex.Message}");
             }
+        }
+
+        [HttpGet("sources")]
+        public ActionResult GetSourcesBiasStats()
+        {
+            var stats = dbContext.NewsSources
+                .Select(s => new
+                {
+                    SourceName = s.SourceName,
+                    AverageBias = s.HistoricalBiasScore,
+                    ArticleCount = s.ArticleCount,
+                    Description = s.Description
+                })
+                .OrderByDescending(s => s.ArticleCount)
+                .ToList();
+
+            return Ok(stats);
         }
     }
 

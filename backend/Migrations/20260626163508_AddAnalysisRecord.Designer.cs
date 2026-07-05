@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vector.Server.Data;
 
@@ -11,9 +12,11 @@ using Vector.Server.Data;
 namespace Vector.Server.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626163508_AddAnalysisRecord")]
+    partial class AddAnalysisRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,29 +58,6 @@ namespace Vector.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AnalysisRecords");
-                });
-
-            modelBuilder.Entity("Vector.Server.Entities.NewsSource", b =>
-                {
-                    b.Property<string>("SourceName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ArticleCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("HistoricalBiasScore")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("LastEvaluatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("SourceName");
-
-                    b.ToTable("NewsSources");
                 });
 
             modelBuilder.Entity("Vector.Server.Entities.User", b =>

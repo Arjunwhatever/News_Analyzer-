@@ -5,6 +5,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../environment';
 import { AnalysisResult } from '../models/analysis-result';
 
+export interface SourceBiasStat {
+  sourceName: string;
+  averageBias: number;
+  articleCount: number;
+  description?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnalysisService {
   private readonly apiUrl = `${environment.apiBaseUrl}/analysis`;
@@ -19,6 +26,11 @@ export class AnalysisService {
       : { text: input.trim() };
 
     return this.http.post<AnalysisResult>(`${this.apiUrl}/analyze`, payload);
+  }
+
+  // Fetch aggregated source bias statistics from the database
+  getSourceBiasStats(): Observable<SourceBiasStat[]> {
+    return this.http.get<SourceBiasStat[]>(`${this.apiUrl}/sources`);
   }
 
   // A quick helper to figure out if the user pasted a link or an entire article.

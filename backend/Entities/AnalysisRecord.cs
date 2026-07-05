@@ -8,6 +8,8 @@ namespace Vector.Server.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        public Guid? UserId { get; set; }
+
         [Required]
         [MaxLength(255)]
         public string SourceName { get; set; } = string.Empty;

@@ -48,10 +48,12 @@ namespace Vector.Server.Controller
                 }
 
                 string? userTopics = null;
+                Guid? currentUserId = null;
                 var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var userId))
+                if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var parsedUserId))
                 {
-                    userTopics = await authService.GetPreferencesAsync(userId);
+                    currentUserId = parsedUserId;
+                    userTopics = await authService.GetPreferencesAsync(parsedUserId);
                 }
 
                 // Once we have a decent chunk of text, we hand it off to the Bias Analyzer Service to do the heavy lifting!
@@ -98,6 +100,7 @@ namespace Vector.Server.Controller
 
                 var record = new Vector.Server.Entities.AnalysisRecord
                 {
+                    UserId = currentUserId,
                     SourceName = sourceName,
                     ArticleUrl = request.Url ?? "N/A",
                     ArticleTitle = "Unknown Title", // Future enhancement: extract title during scraping

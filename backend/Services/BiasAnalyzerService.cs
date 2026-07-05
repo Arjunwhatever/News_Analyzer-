@@ -57,40 +57,70 @@ namespace Vector.Server.Services
                     responseMimeType = "application/json"
                 }
             };
-
             var json    = JsonSerializer.Serialize(requestBody, _jsonOptions);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var url = $"{ApiBase}/{Model}:generateContent?key={_apiKey}";
+            var modelsToTry = new[] { "gemini-3.5-flash", "gemini-1.5-flash" };
 
-            try
+            int maxRetries = 2; // per model
+
+            foreach (var currentModel in modelsToTry)
             {
-                var response = await _http.PostAsync(url, content);
-
-                if (response.IsSuccessStatusCode)
+                var url = $"{ApiBase}/{currentModel}:generateContent?key={_apiKey}";
+                
+                for (int attempt = 1; attempt <= maxRetries; attempt++)
                 {
-                    var tempJson = await response.Content.ReadAsStringAsync();
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
                     try
                     {
-                        var result = ParseResponse(tempJson, Model);
-                        _logger.LogInformation("Successfully parsed LLM Response from {Model}", Model);
-                        return result;
+                        var response = await _http.PostAsync(url, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var tempJson = await response.Content.ReadAsStringAsync();
+                            try
+                            {
+                                var result = ParseResponse(tempJson, currentModel);
+                                _logger.LogInformation("Successfully parsed LLM Response from {Model}", currentModel);
+                                return result;
+                            }
+                            catch (InvalidOperationException ex)
+                            {
+                                _logger.LogWarning("Model {Model} returned invalid JSON: {Error}", currentModel, ex.Message);
+                                if (attempt == maxRetries)
+                                    break; // give up on this model if JSON is consistently invalid
+                                
+                                await Task.Delay(1000 * attempt);
+                                continue;
+                            }
+                        }
+
+                        var errorBody = await response.Content.ReadAsStringAsync();
+                        _logger.LogError("Model {Model} failed with {StatusCode} on attempt {Attempt}: {ErrorBody}", currentModel, response.StatusCode, attempt, errorBody);
+                        
+                        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                        {
+                            break; // Bad request won't fix itself on retry, maybe next model works
+                        }
+                        
+                        if (attempt == maxRetries)
+                        {
+                            break; // Move to next model
+                        }
+                        
+                        await Task.Delay(1000 * attempt);
                     }
-                    catch (InvalidOperationException ex)
+                    catch (TaskCanceledException)
                     {
-                        _logger.LogWarning("Model {Model} returned invalid JSON: {Error}", Model, ex.Message);
-                        throw new HttpRequestException("Gemini returned invalid JSON. Try again.", ex);
+                        _logger.LogWarning("Model {Model} timed out on attempt {Attempt}.", currentModel, attempt);
+                        if (attempt == maxRetries)
+                        {
+                            break; // Move to next model
+                        }
+                        await Task.Delay(1000 * attempt);
                     }
                 }
+            }
 
-                var errorBody = await response.Content.ReadAsStringAsync();
-                _logger.LogError("Model {Model} failed with {StatusCode}: {ErrorBody}", Model, response.StatusCode, errorBody);
-                throw new HttpRequestException($"Gemini failed to process the request: {response.StatusCode}");
-            }
-            catch (TaskCanceledException)
-            {
-                _logger.LogError("Model {Model} timed out.", Model);
-                throw new HttpRequestException("The request to Gemini timed out.");
-            }
+            throw new HttpRequestException("Gemini failed to process the request after trying all fallback models and retries.");
         }
 
         public async Task<(double biasScore, string description)> AnalyzeSourceHistoricalBiasAsync(string sourceName)
@@ -175,6 +205,10 @@ namespace Vector.Server.Services
             You are an expert political media analyst. Your job is to evaluate the political bias
             of news articles and produce structured analysis in JSON format only.
 
+            CRITICAL TOPIC INSTRUCTION:
+            For the "topics" array, NEVER use broad categories like 'Politics', 'Art', 'History', or 'News'.
+            You MUST use highly specific proper nouns, names of people, specific locations (e.g., 'Gaza'), or precise event names.
+
             Scoring guidelines (biasScore):
               -10 to -8  : Far-left / socialist / progressive extremism
               -7  to -5  : Strong left-wing / liberal framing
@@ -200,7 +234,7 @@ namespace Vector.Server.Services
               "tone": "<Analytical | Emotional | Sensational | Neutral | Partisan>",
               "keyIndicators": ["<indicator 1>", "<indicator 2>", ...],
               "summary": "<2-3 sentence plain-English explanation of the bias>",
-              "topics": ["<topic 1>", "<topic 2>", ...],
+              "topics": ["<Proper noun 1 (e.g. 'Gaza')>", "<Proper noun 2 (e.g. 'Supreme Court')>"], // NEVER use broad categories like 'Politics' or 'History'
               "relevanceScore": <number 0 to 100>
             }{{relevanceInstruction}}
             """;

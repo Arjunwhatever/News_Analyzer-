@@ -16,4 +16,12 @@ export class FeedService {
     }
     return this.http.get<LiveNewsArticle[]>('/api/Feed/live', { params });
   }
+
+  getRecommendations(topics?: string): Observable<any> {
+    let params = new HttpParams();
+    if (topics) {
+      params = params.set('topics', topics);
+    }
+    return this.http.get<any>('/api/Dashboard/recommendations', { params });
+  }
 }

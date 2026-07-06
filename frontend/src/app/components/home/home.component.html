@@ -57,8 +57,9 @@
       </button>
     </div>
 
-    <!-- Results card -->
-    <div class="results-card" *ngIf="result">
+    <div class="analysis-results-container" *ngIf="result">
+      <!-- Results card -->
+      <div class="results-card">
 
       <!-- Bias meter -->
       <div class="bias-section">
@@ -116,6 +117,23 @@
       <button class="reset-btn" (click)="reset()">
         ← analyze another
       </button>
+      </div>
+
+      <!-- Perspective Balancer Recommendations -->
+      <div class="recommendations-card" *ngIf="recommendationsData">
+        <h3 class="section-label" style="margin-top:0; color:#4a90d9;">perspective balancer</h3>
+        <p class="recommendations-message">{{ recommendationsData.message }}</p>
+        
+        <div class="recommended-articles">
+          <a class="rec-article" *ngFor="let article of recommendationsData.articles | slice:0:3" [href]="article.url" target="_blank">
+            <div class="rec-article-image" *ngIf="article.imageUrl" [style.background-image]="'url(' + article.imageUrl + ')'"></div>
+            <div class="rec-article-content">
+              <span class="rec-source">{{ article.sourceName }}</span>
+              <h4 class="rec-title">{{ article.title }}</h4>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
 
     <!-- Source Bias Dashboard -->

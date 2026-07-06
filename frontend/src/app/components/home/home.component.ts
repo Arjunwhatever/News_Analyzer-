@@ -6,7 +6,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
 import { AnalysisService, SourceBiasStat } from '../../services/analysis.service';
+import { FeedService } from '../../services/feed.service';
 import { AnalysisResult } from '../../models/analysis-result';
+import { LiveNewsArticle } from '../../models/live-news-article';
+
+export interface RecommendationResponse {
+  averageBiasScore: number;
+  message: string;
+  articles: LiveNewsArticle[];
+}
 
 @Component({
   selector: 'app-home',
@@ -29,7 +37,10 @@ export class HomeComponent {
 
   private authService = inject(AuthService);
   private analysisService = inject(AnalysisService);
+  private feedService = inject(FeedService);
   private router = inject(Router);
+
+  recommendationsData: RecommendationResponse | null = null;
 
   logout() {
     this.authService.logout();
@@ -134,6 +145,7 @@ export class HomeComponent {
           this.result = data;
           this.isLoading = false;
           this.fetchSourceStats(); // Refresh the dashboard
+          this.fetchRecommendations();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -144,9 +156,31 @@ export class HomeComponent {
       });
   }
 
+  fetchRecommendations() {
+    let topicsParam: string | undefined = undefined;
+    
+    // Extract highly specific keywords (topics) detected in the currently analyzed article.
+    // These topics are passed to the backend to ensure recommendations are about the same subject matter,
+    // rather than just random news from opposite-leaning sources.
+    if (this.result && this.result.topics && this.result.topics.length > 0) {
+      topicsParam = this.result.topics.join(',');
+    }
+
+    this.feedService.getRecommendations(topicsParam)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.recommendationsData = data;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Failed to fetch recommendations', err)
+      });
+  }
+
   reset() {
     this.inputText = '';
     this.result = null;
     this.error = null;
+    this.recommendationsData = null;
   }
 }

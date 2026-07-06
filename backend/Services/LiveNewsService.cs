@@ -33,6 +33,9 @@ namespace Vector.Server.Services
                 query = string.Join(" OR ", parts);
             }
 
+            // We use 'q=' instead of 'qInTitle=' because the AI is prompted to return highly specific entities 
+            // (like "Gaza" or "Supreme Court") which might not always appear in the article title.
+            // Searching the full article body and description yields more relevant results for specific entities.
             var url = $"https://newsapi.org/v2/everything?q={Uri.EscapeDataString(query)}&language=en&sortBy=publishedAt&from={fromDate}&apiKey={_apiKey}";
             
             var response = await _http.GetAsync(url);
@@ -81,6 +84,10 @@ namespace Vector.Server.Services
             }
 
             var domainStr = string.Join(",", domains);
+            
+            // We use 'q=' instead of 'qInTitle=' to search across the entire article description and body.
+            // This is crucial because the AI returns highly specific proper nouns (e.g. names, places) 
+            // that may only appear in the article's text rather than the headline.
             var url = $"https://newsapi.org/v2/everything?q={Uri.EscapeDataString(query)}&domains={Uri.EscapeDataString(domainStr)}&language=en&sortBy=publishedAt&from={fromDate}&apiKey={_apiKey}";
             
             var response = await _http.GetAsync(url);

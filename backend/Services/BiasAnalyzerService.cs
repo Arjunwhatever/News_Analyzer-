@@ -58,8 +58,12 @@ namespace Vector.Server.Services
                 }
             };
             var json    = JsonSerializer.Serialize(requestBody, _jsonOptions);
+            // Attempt to analyze the article using a list of fallback models.
+            // If a higher-tier model (e.g. gemini-3.5-flash) is experiencing high demand (503 Service Unavailable),
+            // the system will automatically fall back to the next model (e.g. gemini-1.5-flash).
             var modelsToTry = new[] { "gemini-3.5-flash", "gemini-1.5-flash" };
 
+            // We allow up to 2 retries per model to handle transient network issues or temporary server-side spikes.
             int maxRetries = 2; // per model
 
             foreach (var currentModel in modelsToTry)
@@ -96,11 +100,14 @@ namespace Vector.Server.Services
                         var errorBody = await response.Content.ReadAsStringAsync();
                         _logger.LogError("Model {Model} failed with {StatusCode} on attempt {Attempt}: {ErrorBody}", currentModel, response.StatusCode, attempt, errorBody);
                         
+                        // 400 Bad Request indicates a permanent error with the payload format. 
+                        // Retrying won't fix this, so we break out of the retry loop for this model.
                         if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                         {
                             break; // Bad request won't fix itself on retry, maybe next model works
                         }
                         
+                        // If we've exhausted all retries for the current model, break and try the next fallback model.
                         if (attempt == maxRetries)
                         {
                             break; // Move to next model
